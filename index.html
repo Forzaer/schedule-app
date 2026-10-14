@@ -40,10 +40,11 @@
   Чтобы добавить группу — скопируйте объект группы и поменяйте ключ.
   ═══════════════════════════════════════════════════════════════════════
 -->
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!-- Шрифты и SDK Telegram грузятся без блокировки: если telegram.org или Google Fonts
+     недоступны или медленные, приложение всё равно сразу открывается. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
 <!-- ═════════════════════════ ДАННЫЕ РАСПИСАНИЯ ═════════════════════════ -->
 <script type="application/json" id="schedule-data">
@@ -489,9 +490,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   "use strict";
 
   /* ─────────── Telegram WebApp ─────────── */
-  const tg = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData !== undefined
-    ? window.Telegram.WebApp : null;
-  const inTelegram = !!(tg && tg.platform && tg.platform !== "unknown");
+  // SDK подключается асинхронно (см. initTelegram внизу), до его загрузки tg = null
+  let tg = null;
+  let inTelegram = false;
   const haptic = {
     tap: () => { try { inTelegram && tg.HapticFeedback.impactOccurred("light"); } catch (e) {} },
     select: () => { try { inTelegram && tg.HapticFeedback.selectionChanged(); } catch (e) {} },
@@ -942,23 +943,32 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
       needed ? tg.BackButton.show() : tg.BackButton.hide();
     } catch (e) {}
   }
-  if (inTelegram && tg.BackButton) {
-    tg.BackButton.onClick(() => {
-      if (state.sheetOpen) closeSheet();
-      else if (state.group) showSchedule();
-    });
-  }
-
-  /* ─────────── Старт ─────────── */
-  if (inTelegram) {
+  function initTelegram() {
+    const w = window.Telegram && window.Telegram.WebApp;
+    if (!w || !w.platform || w.platform === "unknown") return;
+    tg = w; inTelegram = true;
     try {
       tg.ready();
       tg.expand();
       if (tg.disableVerticalSwipes) tg.disableVerticalSwipes(); // чтобы свайп вниз в панели не закрывал приложение
+      if (tg.BackButton) tg.BackButton.onClick(() => {
+        if (state.sheetOpen) closeSheet();
+        else if (state.group) showSchedule();
+      });
     } catch (e) {}
+    applyTheme();
+    updateBackButton();
   }
+
+  /* ─────────── Старт ─────────── */
+  // сначала показываем приложение, потом подключаем Telegram
   applyTheme();
   if (state.group) showSchedule(); else showPicker();
+  const sdk = document.createElement("script");
+  sdk.src = "https://telegram.org/js/telegram-web-app.js";
+  sdk.async = true;
+  sdk.onload = initTelegram;
+  document.head.appendChild(sdk);
 })();
 </script>
 </body>
