@@ -7,46 +7,12 @@
 <meta name="format-detection" content="telephone=no">
 <title>Расписание</title>
 <!--
-  ═══════════════════════════════════════════════════════════════════════
-  РАСПИСАНИЕ — Telegram Mini App в одном файле (HTML + CSS + JS)
-  ═══════════════════════════════════════════════════════════════════════
-
-  КАК ПОДКЛЮЧИТЬ В TELEGRAM
-  1. Захостите этот файл по HTTPS. Проще всего GitHub Pages:
-     репозиторий → Settings → Pages → Source: "Deploy from a branch",
-     ветка main, папка / (root). Через минуту файл будет доступен по
-     адресу https://<логин>.github.io/<репозиторий>/
-  2. В Telegram откройте @BotFather:
-     • /newbot — создайте бота (если его ещё нет);
-     • /newapp — выберите бота, введите название, описание, картинку
-       640×360 и вставьте URL из шага 1. Получите ссылку вида
-       https://t.me/<бот>/<короткое_имя> — это и есть Mini App.
-     • Дополнительно: /mybots → бот → Bot Settings → Menu Button →
-       Configure menu button → тот же URL. Тогда кнопка «Расписание»
-       появится слева от поля ввода в чате с ботом.
-  3. Готово. Вне Telegram файл тоже работает как обычная веб-страница.
-
-  КАК РЕДАКТИРОВАТЬ РАСПИСАНИЕ
-  Все данные лежат в блоке <script id="schedule-data"> ниже (чистый JSON).
-  У каждой группы может быть два источника пар:
-    • "weekly" — повторяющаяся неделя: monday … sunday → список пар;
-    • "dates"  — пары на конкретную дату: "2026-10-14" → список пар.
-  Для любого дня сначала ищется точная дата в "dates", затем день недели
-  в "weekly". Если нет ни того, ни другого, приложение честно пишет
-  «Нет данных» (а для групп с "weekly" — «Выходной»).
-  Поля пары: num (номер), time ("09:00-10:30"), subject, type
-  (лекция / практика / лабораторная / любое другое), teacher, room,
-  topic (тема), link (ссылка на материалы). Пустые поля просто скрываются.
-  Чтобы добавить группу — скопируйте объект группы и поменяйте ключ.
-  ═══════════════════════════════════════════════════════════════════════
+  Расписание — Telegram Mini App в одном файле, без внешних зависимостей.
+  Подключение к Telegram и правила редактирования данных: README.md в репозитории.
+  Данные ниже: "weekly" — повторяющаяся неделя (monday…sunday),
+  "dates" — пары на конкретную дату ("2026-10-14"). Дата важнее дня недели.
+  Поля пары: num, time, subject, type, teacher, room, topic, link.
 -->
-<!-- Шрифты и SDK Telegram грузятся без блокировки: если telegram.org или Google Fonts
-     недоступны или медленные, приложение всё равно сразу открывается. -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-
-<!-- ═════════════════════════ ДАННЫЕ РАСПИСАНИЯ ═════════════════════════ -->
 <script type="application/json" id="schedule-data">
 {
   "groups": {
@@ -139,307 +105,224 @@
   }
 }
 </script>
-
 <style>
 :root{
-  --bg:#07090f;
-  --bg-2:#0c1020;
-  --text:#eef2ff;
-  --text-2:rgba(226,232,255,.66);
-  --text-3:rgba(226,232,255,.42);
-  --glass:rgba(255,255,255,.055);
-  --glass-2:rgba(255,255,255,.09);
-  --glass-strong:rgba(18,22,38,.72);
-  --stroke:rgba(255,255,255,.10);
-  --stroke-2:rgba(255,255,255,.18);
-  --shadow:0 10px 40px -12px rgba(0,0,0,.7);
-  --accent:#7c5cff;
-  --accent-2:#22d3ee;
-  --grid:rgba(255,255,255,.035);
-  --blob-a:#5b3dff; --blob-b:#00c2ff; --blob-c:#ff3d9a;
-  --blob-op:.55;
-
-  --lec:#34d399;   /* лекция — зелёный, как в боте */
-  --prac:#fbbf24;  /* практика — жёлтый */
-  --lab:#a78bfa;   /* лабораторная — фиолетовый */
-  --other:#60a5fa;
-
-  --r-lg:22px; --r-md:16px; --r-sm:12px;
-  --safe-top:max(env(safe-area-inset-top,0px), var(--tg-content-safe-area-inset-top,0px));
-  --safe-bottom:max(env(safe-area-inset-bottom,0px), var(--tg-safe-area-inset-bottom,0px));
-  --font:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --bg:#07090f;--text:#eef2ff;--text-2:rgba(226,232,255,.68);--text-3:rgba(226,232,255,.44);
+  --card-1:rgba(255,255,255,.085);--card-2:rgba(255,255,255,.03);--card-solid:#11152a;
+  --stroke:rgba(255,255,255,.10);--stroke-2:rgba(255,255,255,.18);--hi:rgba(255,255,255,.08);
+  --shadow:0 8px 28px -14px rgba(0,0,0,.8);
+  --accent:#7c5cff;--accent-2:#22d3ee;--grid:rgba(255,255,255,.035);
+  --g1:rgba(91,61,255,.42);--g2:rgba(0,170,255,.30);--g3:rgba(255,61,154,.16);
+  --lec:#34d399;--lec-rgb:52,211,153;--prac:#fbbf24;--prac-rgb:251,191,36;
+  --lab:#a78bfa;--lab-rgb:167,139,250;--other:#60a5fa;--other-rgb:96,165,250;
+  --r-lg:22px;--r-md:16px;
+  --safe-top:max(env(safe-area-inset-top,0px),var(--tg-top,0px));
+  --safe-bottom:max(env(safe-area-inset-bottom,0px),var(--tg-bottom,0px));
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,"Roboto Mono",Menlo,monospace;
 }
 :root[data-theme="light"]{
-  --bg:#eef1fb;
-  --bg-2:#e3e8f8;
-  --text:#0d1226;
-  --text-2:rgba(13,18,38,.66);
-  --text-3:rgba(13,18,38,.42);
-  --glass:rgba(255,255,255,.55);
-  --glass-2:rgba(255,255,255,.75);
-  --glass-strong:rgba(255,255,255,.82);
-  --stroke:rgba(20,30,80,.10);
-  --stroke-2:rgba(20,30,80,.18);
-  --shadow:0 10px 36px -14px rgba(40,50,120,.35);
-  --grid:rgba(20,30,90,.05);
-  --blob-op:.35;
-  --lec:#059669; --prac:#d97706; --lab:#7c3aed; --other:#2563eb;
+  --bg:#eef1fb;--text:#0d1226;--text-2:rgba(13,18,38,.68);--text-3:rgba(13,18,38,.45);
+  --card-1:rgba(255,255,255,.88);--card-2:rgba(255,255,255,.6);--card-solid:#ffffff;
+  --stroke:rgba(20,30,80,.10);--stroke-2:rgba(20,30,80,.18);--hi:rgba(255,255,255,.7);
+  --shadow:0 8px 26px -16px rgba(40,50,120,.45);--grid:rgba(20,30,90,.05);
+  --g1:rgba(91,61,255,.20);--g2:rgba(0,170,255,.18);--g3:rgba(255,61,154,.10);
+  --lec:#059669;--lec-rgb:5,150,105;--prac:#d97706;--prac-rgb:217,119,6;
+  --lab:#7c3aed;--lab-rgb:124,58,237;--other:#2563eb;--other-rgb:37,99,235;
 }
-
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%}
-body{
-  background:var(--bg);color:var(--text);font-family:var(--font);
-  font-size:15px;line-height:1.4;overflow:hidden;
-  -webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;
-  transition:background-color .4s ease,color .4s ease;
-}
-button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+body{background:var(--bg);color:var(--text);font:15px/1.4 var(--font);overflow:hidden;
+  -webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
 
-/* ───────────── Фон: светящиеся пятна + техно-сетка ───────────── */
-.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:var(--blob-op);will-change:transform;transition:opacity .4s}
-.blob.a{width:60vmax;height:60vmax;background:var(--blob-a);top:-25vmax;left:-20vmax;animation:drift1 22s ease-in-out infinite alternate}
-.blob.b{width:50vmax;height:50vmax;background:var(--blob-b);bottom:-25vmax;right:-20vmax;animation:drift2 26s ease-in-out infinite alternate}
-.blob.c{width:34vmax;height:34vmax;background:var(--blob-c);top:40%;left:55%;opacity:calc(var(--blob-op)*.6);animation:drift3 30s ease-in-out infinite alternate}
-@keyframes drift1{to{transform:translate(18vmax,14vmax) scale(1.15)}}
-@keyframes drift2{to{transform:translate(-16vmax,-12vmax) scale(1.1)}}
-@keyframes drift3{to{transform:translate(-30vmax,-10vmax) scale(.85)}}
-.grid{
-  position:absolute;inset:-2px;
+/* Фон: статичные градиенты и сетка, без blur-фильтров (дёшево для GPU) */
+.bg{position:fixed;top:0;right:0;bottom:0;left:0;z-index:0;pointer-events:none;
+  background:radial-gradient(circle at 0 0,var(--g1),transparent 55%),
+             radial-gradient(circle at 100% 100%,var(--g2),transparent 55%),
+             radial-gradient(circle at 85% 45%,var(--g3),transparent 40%)}
+.bg:after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;
   background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
   background-size:32px 32px;
-  mask-image:radial-gradient(ellipse at 50% 30%,#000 30%,transparent 80%);
-  -webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000 30%,transparent 80%);
-}
-.scan{position:absolute;left:0;right:0;height:140px;top:-140px;
-  background:linear-gradient(180deg,transparent,rgba(124,92,255,.07),transparent);
-  animation:scan 9s linear infinite}
-@keyframes scan{to{transform:translateY(calc(100vh + 140px))}}
+  -webkit-mask-image:radial-gradient(ellipse at 50% 25%,#000 25%,transparent 75%);
+  mask-image:radial-gradient(ellipse at 50% 25%,#000 25%,transparent 75%)}
 
-/* ───────────── Общие стеклянные поверхности ───────────── */
-.glass{
-  background:var(--glass);
-  border:1px solid var(--stroke);
-  backdrop-filter:blur(18px) saturate(160%);
-  -webkit-backdrop-filter:blur(18px) saturate(160%);
-  box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.06);
-}
+/* «Стекло» без backdrop-filter: полупрозрачный градиент, тонкая рамка и блик сверху */
+.glass{background:linear-gradient(150deg,var(--card-1),var(--card-2));border:1px solid var(--stroke);
+  box-shadow:var(--shadow),inset 0 1px 0 var(--hi)}
 
-.screen{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;
-  padding:calc(var(--safe-top) + 14px) 16px 0;
-  transition:opacity .35s ease,transform .45s cubic-bezier(.2,.8,.2,1)}
-.screen.hidden{opacity:0;pointer-events:none;transform:scale(.97)}
+.screen{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1;display:flex;flex-direction:column;
+  padding:calc(var(--safe-top) + 14px) 16px 0;transition:opacity .25s ease}
+.screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
 
-/* ───────────── Экран выбора группы ───────────── */
-.picker{overflow-y:auto;padding-bottom:calc(var(--safe-bottom) + 24px)}
+/* Выбор группы */
+.picker{overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--safe-bottom) + 24px)}
 .brand{display:flex;align-items:center;gap:10px;margin:8px 0 26px}
-.logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  box-shadow:0 0 24px -4px var(--accent)}
+.logo{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 0 22px -4px var(--accent)}
 .logo svg{width:22px;height:22px}
-.brand b{font-size:17px;letter-spacing:.2px}
-.brand small{display:block;color:var(--text-3);font-family:var(--mono);font-size:11px;letter-spacing:.8px}
-.hero h1{font-size:32px;line-height:1.08;margin:0 0 8px;font-weight:800;letter-spacing:-.6px}
+.brand b{font-size:17px}
+.brand small{display:block;color:var(--text-3);font:11px var(--mono);letter-spacing:.8px}
+.hero h1{font-size:31px;line-height:1.08;margin:0 0 8px;font-weight:800;letter-spacing:-.5px}
 .hero h1 span{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero p{margin:0 0 22px;color:var(--text-2)}
 .groups{display:grid;gap:12px}
-.group-card{
-  position:relative;display:flex;align-items:center;gap:14px;text-align:left;
-  padding:16px;border-radius:var(--r-lg);overflow:hidden;
-  transition:transform .2s ease,border-color .2s;
-  animation:rise .5s cubic-bezier(.2,.8,.2,1) both;
-}
+.group-card{position:relative;display:flex;align-items:center;gap:14px;padding:16px;border-radius:var(--r-lg);overflow:hidden;
+  transition:transform .15s ease;animation:rise .35s ease both}
 .group-card:active{transform:scale(.98)}
-.group-card::after{ /* блик при наведении/нажатии */
-  content:"";position:absolute;inset:0;
-  background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.10) 50%,transparent 70%);
-  transform:translateX(-100%);transition:transform .7s ease}
-.group-card:hover::after,.group-card:focus-visible::after{transform:translateX(100%)}
-.group-card .badge{
-  flex:none;width:58px;height:58px;border-radius:16px;display:grid;place-items:center;
-  font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:-.3px;
-  background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(34,211,238,.25));
-  border:1px solid var(--stroke-2)}
+.group-card .badge{flex:none;width:58px;height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  font:700 13px var(--mono);background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(34,211,238,.25));border:1px solid var(--stroke-2)}
 .group-card .meta{flex:1;min-width:0}
 .group-card .meta b{display:block;font-size:18px}
 .group-card .meta span{display:block;color:var(--text-2);font-size:13px;margin-top:2px}
-.group-card .meta em{display:inline-block;margin-top:8px;font-style:normal;font-family:var(--mono);font-size:11px;
-  color:var(--accent-2);padding:3px 8px;border-radius:99px;background:rgba(34,211,238,.10);border:1px solid rgba(34,211,238,.25)}
+.group-card .meta em{display:inline-block;margin-top:8px;font:normal 11px var(--mono);color:var(--accent-2);
+  padding:3px 8px;border-radius:99px;background:rgba(34,211,238,.10);border:1px solid rgba(34,211,238,.25)}
 .group-card .chev{color:var(--text-3);flex:none}
-.group-card.current{border-color:rgba(124,92,255,.6)}
-@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.group-card.current{border-color:rgba(124,92,255,.65)}
+.ver{margin-top:22px;text-align:center;font:11px var(--mono);color:var(--text-3)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-/* ───────────── Экран расписания ───────────── */
+/* Расписание */
 .topbar{display:flex;align-items:center;gap:10px}
-.chip{display:flex;align-items:center;gap:8px;padding:8px 12px 8px 8px;border-radius:99px;min-width:0}
-.chip .dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));font-size:11px;font-weight:800;color:#fff;flex:none}
+.chip{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:99px;min-width:0}
+.chip .dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));font-size:11px;font-weight:800;color:#fff}
 .chip b{font-size:15px;white-space:nowrap}
 .chip svg{opacity:.6;flex:none}
 .spacer{flex:1}
-.icon-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;transition:transform .2s}
+.icon-btn{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;transition:transform .15s}
 .icon-btn:active{transform:scale(.9)}
 .icon-btn svg{width:19px;height:19px}
-
-.week-head{display:flex;align-items:center;gap:8px;margin:18px 0 12px}
+.week-head{display:flex;align-items:center;gap:8px;margin:16px 0 12px}
 .week-head .title{flex:1;min-width:0}
-.week-head .title b{display:block;font-size:22px;font-weight:800;letter-spacing:-.4px;text-transform:capitalize}
-.week-head .title small{font-family:var(--mono);font-size:11px;color:var(--text-3);letter-spacing:.6px;text-transform:uppercase}
-.today-btn{padding:8px 12px;border-radius:99px;font-size:13px;font-weight:700;color:var(--accent-2);transition:opacity .25s,transform .2s}
+.week-head .title b{display:block;font-size:22px;font-weight:800;letter-spacing:-.4px}
+.week-head .title small{display:block;font:11px var(--mono);color:var(--text-3);letter-spacing:.5px;text-transform:uppercase}
+.today-btn{padding:8px 12px;border-radius:99px;font-size:13px;font-weight:700;color:var(--accent-2)}
 .today-btn[hidden]{display:none}
 :root[data-theme="light"] .today-btn{color:var(--accent)}
 
-.week-strip{position:relative;display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:6px;border-radius:20px}
-.day-btn{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 9px;border-radius:14px;transition:color .25s}
-.day-btn .dw{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;transition:color .25s}
-.day-btn .dn{font-size:17px;font-weight:800;font-family:var(--mono)}
-.day-btn .pips{display:flex;gap:2px;height:4px;margin-top:2px}
+.week-strip{position:relative;display:flex;gap:4px;padding:6px;border-radius:20px}
+.day-btn{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0 9px;border-radius:14px;text-align:center}
+.day-btn .dw{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase}
+.day-btn .dn{font:700 17px var(--mono);margin-top:2px}
+.day-btn .pips{display:flex;gap:2px;height:4px;margin-top:4px}
 .day-btn .pips i{width:4px;height:4px;border-radius:50%;background:var(--text-3)}
-.day-btn .pips i.lec{background:var(--lec)} .day-btn .pips i.prac{background:var(--prac)}
-.day-btn .pips i.lab{background:var(--lab)} .day-btn .pips i.other{background:var(--other)}
+.pips .lec{background:var(--lec)!important}.pips .prac{background:var(--prac)!important}
+.pips .lab{background:var(--lab)!important}.pips .other{background:var(--other)!important}
 .day-btn.is-today .dn{color:var(--accent-2)}
-.day-btn.is-today::before{content:"";position:absolute;top:4px;right:calc(50% - 15px);width:5px;height:5px;border-radius:50%;
-  background:var(--accent-2);box-shadow:0 0 8px var(--accent-2);animation:pulse 2s infinite}
+.day-btn.is-today:before{content:"";position:absolute;top:5px;right:50%;margin-right:-16px;width:5px;height:5px;border-radius:50%;background:var(--accent-2);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.3}}
 .day-btn.active .dw,.day-btn.active .dn{color:#fff}
-.day-btn.active .pips i{background:rgba(255,255,255,.85)}
-.indicator{position:absolute;z-index:0;top:6px;bottom:6px;left:6px;border-radius:14px;
+.day-btn.active .pips i{background:rgba(255,255,255,.85)!important}
+.indicator{position:absolute;z-index:0;top:6px;bottom:6px;left:0;width:0;border-radius:14px;
   background:linear-gradient(135deg,var(--accent),#4f7bff 60%,var(--accent-2));
-  box-shadow:0 6px 22px -6px var(--accent),inset 0 1px 0 rgba(255,255,255,.35);
-  transition:transform .45s cubic-bezier(.3,1.3,.5,1),width .3s}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  box-shadow:0 6px 18px -6px var(--accent),inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .35s cubic-bezier(.3,1.25,.5,1)}
 
-.legend{display:flex;gap:14px;margin:12px 4px 2px;font-size:12px;color:var(--text-2)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin:12px 4px 2px;font-size:12px;color:var(--text-2)}
 .legend span{display:flex;align-items:center;gap:6px}
 .legend i{width:8px;height:8px;border-radius:50%}
 
 .viewport{position:relative;flex:1;margin:0 -16px;overflow:hidden;touch-action:pan-y}
-.day-pane{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;
-  padding:12px 16px calc(var(--safe-bottom) + 28px);will-change:transform}
-.day-pane.enter-from-right{animation:inR .42s cubic-bezier(.2,.8,.2,1) both}
-.day-pane.enter-from-left{animation:inL .42s cubic-bezier(.2,.8,.2,1) both}
-.day-pane.leave-to-left{animation:outL .32s ease both}
-.day-pane.leave-to-right{animation:outR .32s ease both}
-@keyframes inR{from{transform:translateX(40%);opacity:0}to{transform:none;opacity:1}}
-@keyframes inL{from{transform:translateX(-40%);opacity:0}to{transform:none;opacity:1}}
-@keyframes outL{to{transform:translateX(-40%);opacity:0}}
-@keyframes outR{to{transform:translateX(40%);opacity:0}}
+.day-pane{position:absolute;top:0;right:0;bottom:0;left:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;padding:12px 16px calc(var(--safe-bottom) + 28px)}
+.in-r{animation:inR .3s ease-out both}.in-l{animation:inL .3s ease-out both}
+.out-l{animation:outL .22s ease-in both}.out-r{animation:outR .22s ease-in both}
+@keyframes inR{from{transform:translateX(30%);opacity:0}to{transform:none;opacity:1}}
+@keyframes inL{from{transform:translateX(-30%);opacity:0}to{transform:none;opacity:1}}
+@keyframes outL{to{transform:translateX(-30%);opacity:0}}
+@keyframes outR{to{transform:translateX(30%);opacity:0}}
 
-.day-summary{display:flex;align-items:baseline;justify-content:space-between;margin:4px 4px 12px;color:var(--text-2);font-size:13px}
+.day-summary{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:4px 4px 12px;color:var(--text-2);font-size:13px}
 .day-summary b{color:var(--text);font-size:15px}
-.day-summary .mono{font-family:var(--mono);font-size:12px}
+.day-summary .mono{font:12px var(--mono);white-space:nowrap}
+.lessons{display:grid;gap:10px}
 
-.lessons{display:grid;gap:10px;position:relative}
-.lesson{
-  --c:var(--other);
-  position:relative;display:grid;grid-template-columns:56px 1fr;gap:12px;text-align:left;width:100%;
-  padding:14px 14px 14px 12px;border-radius:var(--r-lg);overflow:hidden;
-  animation:rise .45s cubic-bezier(.2,.8,.2,1) both;
-  transition:transform .18s ease,border-color .25s;
-}
-.lesson.lec{--c:var(--lec)} .lesson.prac{--c:var(--prac)} .lesson.lab{--c:var(--lab)}
-.lesson:active{transform:scale(.982)}
-.lesson::before{ /* цветная неоновая полоса слева */
-  content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;
-  background:var(--c);box-shadow:0 0 12px var(--c)}
-.lesson::after{ /* мягкое цветное свечение в углу */
-  content:"";position:absolute;right:-40px;top:-40px;width:120px;height:120px;border-radius:50%;
-  background:var(--c);opacity:.10;filter:blur(30px);pointer-events:none}
-.lesson .time{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:2px;font-family:var(--mono)}
-.lesson .time .n{font-size:11px;color:var(--text-3);letter-spacing:.5px}
+.lesson{--c:var(--other);--c-rgb:var(--other-rgb);position:relative;display:flex;flex-wrap:wrap;width:100%;
+  padding:14px 14px 14px 12px;border-radius:var(--r-lg);overflow:hidden;transition:transform .12s ease}
+.lesson.lec{--c:var(--lec);--c-rgb:var(--lec-rgb)}.lesson.prac{--c:var(--prac);--c-rgb:var(--prac-rgb)}
+.lesson.lab{--c:var(--lab);--c-rgb:var(--lab-rgb)}
+.lesson:active{transform:scale(.985)}
+.lesson:before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--c);box-shadow:0 0 10px var(--c)}
+.lesson:after{content:"";position:absolute;right:0;top:0;width:140px;height:140px;pointer-events:none;
+  background:radial-gradient(circle at 100% 0,rgba(var(--c-rgb),.16),transparent 70%)}
+.lesson .time{width:56px;flex:none;display:flex;flex-direction:column;align-items:center;padding-top:2px;font-family:var(--mono)}
+.lesson .time .n{font-size:11px;color:var(--text-3)}
 .lesson .time .s{font-size:15px;font-weight:700;margin-top:2px}
 .lesson .time .e{font-size:12px;color:var(--text-3)}
-.lesson .body{min-width:0}
-.lesson .tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--c)}
-.lesson .tag::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+.lesson .body{flex:1;min-width:0;padding-left:12px}
+.tag{display:inline-flex;align-items:center;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--c)}
+.tag:before{content:"";width:6px;height:6px;margin-right:6px;border-radius:50%;background:var(--c)}
 .lesson h3{margin:4px 0 6px;font-size:15.5px;line-height:1.28;font-weight:700;
   display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.lesson .info{display:flex;flex-wrap:wrap;gap:4px 12px;color:var(--text-2);font-size:12.5px}
-.lesson .info span{display:inline-flex;align-items:center;gap:4px}
-.lesson .info svg{width:13px;height:13px;opacity:.75}
+.info{display:flex;flex-wrap:wrap;color:var(--text-2);font-size:12.5px}
+.info span{display:inline-flex;align-items:center;margin-right:12px}
+.info svg{width:13px;height:13px;margin-right:4px;opacity:.75;flex:none}
 .lesson.past{opacity:.5}
-.lesson.now{border-color:color-mix(in srgb,var(--c) 55%,transparent);
-  box-shadow:var(--shadow),0 0 0 1px color-mix(in srgb,var(--c) 25%,transparent),0 0 30px -10px var(--c)}
-.live{display:inline-flex;align-items:center;gap:6px;margin-left:8px;font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
-  color:#fff;background:var(--c);padding:2px 7px;border-radius:99px}
-.live::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff;animation:pulse 1.2s infinite}
-:root[data-theme="light"] .live{color:#fff}
-.progress{grid-column:1 / -1;height:4px;border-radius:4px;background:var(--glass-2);overflow:hidden;margin-top:2px}
-.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--c),#fff);border-radius:4px;transition:width 1s linear}
-.progress-label{grid-column:1 / -1;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--text-3);margin-top:-6px}
-
-.gap{display:flex;align-items:center;gap:10px;color:var(--text-3);font-size:12px;font-family:var(--mono);padding:0 8px}
-.gap::before,.gap::after{content:"";flex:1;height:1px;background:repeating-linear-gradient(90deg,var(--stroke-2) 0 4px,transparent 4px 8px)}
-
-.empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:42px 20px;border-radius:var(--r-lg);animation:rise .45s both}
-.empty .ico{font-size:44px;margin-bottom:10px;filter:drop-shadow(0 6px 18px rgba(124,92,255,.5))}
+.lesson.now{border-color:rgba(var(--c-rgb),.6);box-shadow:var(--shadow),0 0 26px -8px rgba(var(--c-rgb),.7)}
+.live{display:inline-block;margin-left:8px;font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+  color:#fff;background:var(--c);padding:2px 7px;border-radius:99px;vertical-align:1px}
+.progress{width:100%;height:4px;border-radius:4px;background:var(--stroke);overflow:hidden;margin-top:12px}
+.progress i{display:block;height:100%;background:var(--c);border-radius:4px}
+.progress-label{width:100%;display:flex;justify-content:space-between;font:11px var(--mono);color:var(--text-3);margin-top:6px}
+.gap{display:flex;align-items:center;color:var(--text-3);font:12px var(--mono);padding:0 8px}
+.gap:before,.gap:after{content:"";flex:1;height:1px;margin:0 10px;background:var(--stroke-2);opacity:.6}
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:40px 20px;border-radius:var(--r-lg)}
+.empty .ico{font-size:42px;margin-bottom:10px}
 .empty b{font-size:17px}
 .empty p{margin:6px 0 0;color:var(--text-2);font-size:13.5px;max-width:280px}
-
 .next-hint{margin:12px 4px 0;font-size:12.5px;color:var(--text-2);text-align:center}
 .next-hint b{color:var(--accent-2)}
 
-/* ───────────── Нижняя панель с деталями ───────────── */
-.overlay{position:fixed;inset:0;z-index:10;background:rgba(3,5,12,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-  opacity:0;pointer-events:none;transition:opacity .3s}
-.overlay.open{opacity:1;pointer-events:auto}
-.sheet{
-  --c:var(--other);
-  position:fixed;left:0;right:0;bottom:0;z-index:11;max-height:88vh;overflow-y:auto;
-  padding:10px 18px calc(var(--safe-bottom) + 22px);
-  border-radius:28px 28px 0 0;border-bottom:0;
-  background:var(--glass-strong);
-  transform:translateY(105%);transition:transform .42s cubic-bezier(.2,.9,.2,1);
-}
-.sheet.open{transform:none}
+/* Нижняя панель */
+.overlay{position:fixed;top:0;right:0;bottom:0;left:0;z-index:10;background:rgba(3,5,12,.6);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.overlay.open{opacity:1;visibility:visible}
+.sheet{--c:var(--other);--c-rgb:var(--other-rgb);position:fixed;left:0;right:0;bottom:0;z-index:11;max-height:88%;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;padding:10px 18px calc(var(--safe-bottom) + 22px);border-radius:26px 26px 0 0;
+  background:var(--card-solid);border-top:1px solid var(--stroke-2);box-shadow:0 -10px 40px -10px rgba(0,0,0,.6);
+  transform:translateY(105%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.9,.2,1),visibility 0s .32s}
+.sheet.open{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.9,.2,1),visibility 0s}
 .sheet.dragging{transition:none}
-.sheet.lec{--c:var(--lec)} .sheet.prac{--c:var(--prac)} .sheet.lab{--c:var(--lab)}
-.sheet::before{content:"";position:absolute;left:0;right:0;top:0;height:120px;pointer-events:none;
-  background:radial-gradient(ellipse at 50% -20%,var(--c),transparent 70%);opacity:.22}
+.sheet.lec{--c:var(--lec);--c-rgb:var(--lec-rgb)}.sheet.prac{--c:var(--prac);--c-rgb:var(--prac-rgb)}.sheet.lab{--c:var(--lab);--c-rgb:var(--lab-rgb)}
+.sheet:before{content:"";position:absolute;left:0;right:0;top:0;height:120px;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 0,rgba(var(--c-rgb),.22),transparent 70%)}
 .grabber{width:42px;height:5px;border-radius:5px;background:var(--stroke-2);margin:2px auto 16px}
-.sheet .tag{display:inline-flex;align-items:center;gap:8px;padding:5px 11px;border-radius:99px;font-size:12px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.6px;color:var(--c);
-  background:color-mix(in srgb,var(--c) 14%,transparent);border:1px solid color-mix(in srgb,var(--c) 35%,transparent)}
-.sheet h2{position:relative;margin:12px 0 4px;font-size:22px;line-height:1.2;font-weight:800;letter-spacing:-.3px}
+.sheet .tag{padding:5px 11px;border-radius:99px;font-size:12px;background:rgba(var(--c-rgb),.14);border:1px solid rgba(var(--c-rgb),.35)}
+.sheet h2{position:relative;margin:12px 0 4px;font-size:21px;line-height:1.2;font-weight:800}
 .sheet .topic{position:relative;margin:0 0 4px;color:var(--text-2);font-size:14px}
 .rows{position:relative;display:grid;gap:8px;margin-top:16px}
-.row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--r-md);background:var(--glass);border:1px solid var(--stroke)}
-.row .ri{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;flex:none;
-  background:color-mix(in srgb,var(--c) 15%,transparent);color:var(--c)}
+.row{display:flex;align-items:center;padding:12px 14px;border-radius:var(--r-md);background:var(--card-2);border:1px solid var(--stroke)}
+.row .ri{width:36px;height:36px;margin-right:12px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none;
+  background:rgba(var(--c-rgb),.15);color:var(--c)}
 .row .ri svg{width:18px;height:18px}
-.row small{display:block;font-size:11.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
-.row b{display:block;font-size:15px;font-weight:700;word-break:break-word}
+.row small{display:block;font-size:11.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
+.row b{display:block;font-size:15px;word-break:break-word}
 .row.muted b{color:var(--text-3);font-weight:500}
 .sheet-actions{position:relative;display:flex;gap:10px;margin-top:16px}
-.btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:var(--r-md);font-weight:800;font-size:15px;transition:transform .15s}
-.btn:active{transform:scale(.97)}
-.btn.primary{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 10px 24px -10px var(--accent)}
-.btn.ghost{background:var(--glass-2);border:1px solid var(--stroke)}
+.btn{flex:1;display:flex;align-items:center;justify-content:center;height:50px;border-radius:var(--r-md);font-weight:800;font-size:15px;text-align:center}
+.btn svg{width:18px;height:18px;margin-right:8px}
+.btn.primary{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+.btn.ghost{background:var(--card-1);border:1px solid var(--stroke)}
 
-/* мелкие экраны */
-@media (max-width:350px){
-  .day-btn .dn{font-size:15px}
-  .lesson{grid-template-columns:48px 1fr}
-  .hero h1{font-size:27px}
-}
-@media (min-width:640px){
-  .screen{max-width:560px;margin:0 auto}
-  .sheet{max-width:560px;margin:0 auto}
-}
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
-}
+#err{display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:99;padding:12px 14px;border-radius:14px;
+  background:#3b0d18;color:#ffd5dc;font:12px/1.4 var(--mono);white-space:pre-wrap;-webkit-user-select:text;user-select:text}
+
+@media (max-width:350px){.day-btn .dn{font-size:15px}.lesson .time{width:48px}.hero h1{font-size:26px}}
+@media (min-width:640px){.screen,.sheet{max-width:560px;margin:0 auto}}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<div id="err"></div>
+<script>
+// Если что-то сломается, показываем ошибку на экране, а не пустое окно
+window.onerror = function (msg, src, line) {
+  var box = document.getElementById("err");
+  if (box) { box.style.display = "block"; box.textContent = "Ошибка: " + msg + (line ? " (строка " + line + ")" : ""); }
+};
+</script>
+<div class="bg" aria-hidden="true"></div>
 
-<div class="bg" aria-hidden="true">
-  <div class="blob a"></div><div class="blob b"></div><div class="blob c"></div>
-  <div class="grid"></div><div class="scan"></div>
-</div>
-
-<!-- ═════════ Экран 1: выбор группы ═════════ -->
 <section class="screen picker" id="picker">
   <div class="brand">
     <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M8 14h3M8 17h6"/></svg></div>
@@ -450,9 +333,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
     <p>Приложение запомнит выбор, сменить группу можно в любой момент.</p>
   </div>
   <div class="groups" id="groupList"></div>
+  <div class="ver" id="ver"></div>
 </section>
 
-<!-- ═════════ Экран 2: расписание ═════════ -->
 <section class="screen hidden" id="schedule">
   <div class="topbar">
     <button class="chip glass" id="groupChip" aria-label="Сменить группу">
@@ -462,180 +345,232 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
     <div class="spacer"></div>
     <button class="icon-btn glass" id="themeBtn" aria-label="Сменить тему"></button>
   </div>
-
   <div class="week-head">
     <button class="icon-btn glass" id="prevWeek" aria-label="Предыдущая неделя"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
     <div class="title"><b id="monthLabel"></b><small id="weekLabel"></small></div>
     <button class="today-btn glass" id="todayBtn">Сегодня</button>
     <button class="icon-btn glass" id="nextWeek" aria-label="Следующая неделя"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
   </div>
-
   <div class="week-strip glass" id="weekStrip"><div class="indicator" id="indicator"></div></div>
-
   <div class="legend">
     <span><i style="background:var(--lec)"></i>Лекция</span>
     <span><i style="background:var(--prac)"></i>Практика</span>
     <span><i style="background:var(--lab)"></i>Лабораторная</span>
   </div>
-
   <div class="viewport" id="viewport"></div>
 </section>
 
-<!-- ═════════ Нижняя панель ═════════ -->
 <div class="overlay" id="overlay"></div>
-<div class="sheet glass" id="sheet" role="dialog" aria-modal="true"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
 
 <script>
-(() => {
+(function () {
   "use strict";
+  var APP_VERSION = "2.0";
 
-  /* ─────────── Telegram WebApp ─────────── */
-  // SDK подключается асинхронно (см. initTelegram внизу), до его загрузки tg = null
-  let tg = null;
-  let inTelegram = false;
-  const haptic = {
-    tap: () => { try { inTelegram && tg.HapticFeedback.impactOccurred("light"); } catch (e) {} },
-    select: () => { try { inTelegram && tg.HapticFeedback.selectionChanged(); } catch (e) {} },
+  /* ── Мост к Telegram без внешнего SDK ──
+     Тот же протокол, что в официальном telegram-web-app.js: события уходят через
+     TelegramWebviewProxy (iOS, Android, Desktop) или postMessage (web.telegram.org),
+     ответы приходят в Telegram.WebView.receiveEvent. Так приложению не нужен telegram.org. */
+  var TG = (function () {
+    var params = {};
+    try {
+      location.hash.replace(/^#/, "").split("&").forEach(function (p) {
+        var i = p.indexOf("=");
+        if (i > 0) params[decodeURIComponent(p.slice(0, i))] = decodeURIComponent(p.slice(i + 1).replace(/\+/g, "%20"));
+      });
+    } catch (e) {}
+    try { // после перезагрузки Telegram не передаёт параметры повторно
+      if (params.tgWebAppVersion) sessionStorage.setItem("tgParams", JSON.stringify(params));
+      else params = JSON.parse(sessionStorage.getItem("tgParams") || "null") || params;
+    } catch (e) {}
+
+    var isIframe = false;
+    try { isIframe = window.parent != null && window !== window.parent; } catch (e) {}
+    var hasProxy = function () { return typeof window.TelegramWebviewProxy !== "undefined"; };
+    var hasNotify = function () { try { return !!(window.external && "notify" in window.external); } catch (e) { return false; } };
+    var version = params.tgWebAppVersion || "6.0";
+    var handlers = {};
+
+    function atLeast(v) {
+      var a = version.split("."), b = v.split(".");
+      for (var i = 0; i < Math.max(a.length, b.length); i++) {
+        var x = parseInt(a[i] || 0, 10), y = parseInt(b[i] || 0, 10);
+        if (x !== y) return x > y;
+      }
+      return true;
+    }
+    function post(type, data) {
+      if (data === undefined) data = "";
+      try {
+        if (hasProxy()) window.TelegramWebviewProxy.postEvent(type, JSON.stringify(data));
+        else if (hasNotify()) window.external.notify(JSON.stringify({ eventType: type, eventData: data }));
+        else if (isIframe) window.parent.postMessage(JSON.stringify({ eventType: type, eventData: data }), "*");
+      } catch (e) {}
+    }
+    function receive(type, data) {
+      (handlers[type] || []).forEach(function (fn) { try { fn(data); } catch (e) {} });
+    }
+    window.Telegram = window.Telegram || {};
+    window.Telegram.WebView = window.Telegram.WebView || {};
+    window.Telegram.WebView.receiveEvent = receive;
+    window.TelegramGameProxy = { receiveEvent: receive };
+    window.TelegramGameProxy_receiveEvent = receive;
+    if (isIframe && params.tgWebAppVersion) {
+      window.addEventListener("message", function (ev) {
+        if (ev.source !== window.parent) return;
+        var d;
+        try { d = JSON.parse(ev.data); } catch (e) { return; }
+        if (!d || !d.eventType) return;
+        if (d.eventType === "reload_iframe") { post("iframe_will_reload"); location.reload(); return; }
+        receive(d.eventType, d.eventData);
+      });
+      post("iframe_ready", { reload_supported: true });
+    }
+    return {
+      available: function () { return hasProxy() || hasNotify() || (isIframe && !!params.tgWebAppVersion); },
+      atLeast: atLeast, post: post,
+      on: function (type, fn) { (handlers[type] = handlers[type] || []).push(fn); },
+    };
+  })();
+
+  var haptic = {
+    tap: function () { if (TG.available() && TG.atLeast("6.1")) TG.post("web_app_trigger_haptic_feedback", { type: "impact", impact_style: "light" }); },
+    select: function () { if (TG.available() && TG.atLeast("6.1")) TG.post("web_app_trigger_haptic_feedback", { type: "selection_change" }); },
   };
 
-  /* ─────────── Данные ─────────── */
-  const DATA = JSON.parse(document.getElementById("schedule-data").textContent);
-  const GROUPS = DATA.groups;
-  const WEEKDAYS = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
-  const DW_SHORT = ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
-  const DW_FULL = ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"];
-  const MONTHS = ["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"];
-  const MONTHS_GEN = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+  /* ── Данные ── */
+  var GROUPS = JSON.parse(document.getElementById("schedule-data").textContent).groups;
+  var WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+  var DW_SHORT = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+  var DW_FULL = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+  var MONTHS = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+  var MONTHS_GEN = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+  var has = function (o, k) { return !!o && Object.prototype.hasOwnProperty.call(o, k); };
 
-  /* ─────────── Хранилище (безопасно, если недоступно) ─────────── */
-  const store = {
-    get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },
-    set(k, v){ try { localStorage.setItem(k, v); } catch (e) {} },
+  var store = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
   };
 
-  /* ─────────── Утилиты дат ─────────── */
-  const pad = n => String(n).padStart(2, "0");
-  const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
-  const dayIdx = d => (d.getDay() + 6) % 7;               // 0 = понедельник
-  const mondayOf = d => addDays(startOfDay(d), -dayIdx(d));
-  const sameDay = (a, b) => iso(a) === iso(b);
-  const toMin = t => { const [h, m] = t.trim().split(":").map(Number); return h * 60 + m; };
-  const splitTime = t => (t || "").split(/[-–—]/).map(s => s.trim());
-  const plural = (n, one, few, many) => {
-    const m10 = n % 10, m100 = n % 100;
-    if (m10 === 1 && m100 !== 11) return one;
-    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  /* ── Даты ── */
+  var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+  var iso = function (d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
+  var startOfDay = function (d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
+  var addDays = function (d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); };
+  var dayIdx = function (d) { return (d.getDay() + 6) % 7; }; // 0 = понедельник
+  var mondayOf = function (d) { return addDays(d, -dayIdx(d)); };
+  var sameDay = function (a, b) { return iso(a) === iso(b); };
+  var today = function () { return startOfDay(new Date()); };
+  var splitTime = function (t) { return String(t || "").split(/[-–—]/).map(function (s) { return s.trim(); }); };
+  var toMin = function (t) { var p = String(t || "0:0").split(":"); return (+p[0] || 0) * 60 + (+p[1] || 0); };
+  var nowMin = function () { var n = new Date(); return n.getHours() * 60 + n.getMinutes(); };
+  var short3 = function (m) { return MONTHS_GEN[m].slice(0, 3); };
+  var plural = function (n, one, few, many) {
+    var a = n % 10, b = n % 100;
+    if (a === 1 && b !== 11) return one;
+    if (a >= 2 && a <= 4 && (b < 12 || b > 14)) return few;
     return many;
   };
-  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-
-  const typeClass = t => {
-    const s = (t || "").toLowerCase();
-    if (s.startsWith("лек")) return "lec";
-    if (s.startsWith("прак") || s === "пз" || s.startsWith("сем")) return "prac";
-    if (s.startsWith("лаб")) return "lab";
+  var fmtDur = function (m) {
+    var h = Math.floor(m / 60), r = m % 60;
+    return (h ? h + " ч" : "") + (h && r ? " " : "") + (r || !h ? r + " мин" : "");
+  };
+  var esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+  var typeClass = function (t) {
+    var s = String(t || "").toLowerCase();
+    if (s.indexOf("лек") === 0) return "lec";
+    if (s.indexOf("прак") === 0 || s === "пз" || s.indexOf("сем") === 0) return "prac";
+    if (s.indexOf("лаб") === 0) return "lab";
     return "other";
   };
 
-  /* Пары группы на дату: сначала точная дата, затем повторяющаяся неделя */
-  function getDay(groupName, date) {
-    const g = GROUPS[groupName] || {};
-    const key = iso(date);
-    let list, status;
-    if (g.dates && Object.prototype.hasOwnProperty.call(g.dates, key)) {
-      list = g.dates[key];
-    } else if (g.weekly && Object.prototype.hasOwnProperty.call(g.weekly, WEEKDAYS[dayIdx(date)])) {
-      list = g.weekly[WEEKDAYS[dayIdx(date)]];
-    } else if (g.weekly) {
-      list = [];
-    } else {
-      return { lessons: [], status: "nodata" };
-    }
-    list = (list || []).slice().sort((a, b) => toMin(splitTime(a.time)[0]) - toMin(splitTime(b.time)[0]));
-    status = list.length ? "ok" : "free";
-    return { lessons: list, status };
+  // Пары на дату: сначала точная дата, затем повторяющаяся неделя
+  function getDay(name, date) {
+    var g = GROUPS[name] || {}, key = iso(date), wd = WEEKDAYS[dayIdx(date)], list;
+    if (has(g.dates, key)) list = g.dates[key];
+    else if (g.weekly) list = g.weekly[wd] || [];
+    else return { lessons: [], status: "nodata" };
+    list = (list || []).slice().sort(function (a, b) { return toMin(splitTime(a.time)[0]) - toMin(splitTime(b.time)[0]); });
+    return { lessons: list, status: list.length ? "ok" : "free" };
   }
 
   function groupStats(name) {
-    const g = GROUPS[name];
+    var g = GROUPS[name];
     if (g.weekly) {
-      const n = WEEKDAYS.reduce((s, d) => s + ((g.weekly[d] || []).length), 0);
-      return `${n} ${plural(n, "пара", "пары", "пар")} в неделю`;
+      var n = WEEKDAYS.reduce(function (s, d) { return s + (g.weekly[d] || []).length; }, 0);
+      return n + " " + plural(n, "пара", "пары", "пар") + " в неделю";
     }
-    const days = Object.keys(g.dates || {}).sort();
+    var days = Object.keys(g.dates || {}).sort();
     if (!days.length) return "нет данных";
-    const f = d => { const [y, m, dd] = d.split("-").map(Number); return `${dd} ${MONTHS_GEN[m-1].slice(0,3)}`; };
-    return `по датам · ${f(days[0])} – ${f(days[days.length-1])}`;
+    var f = function (d) { var p = d.split("-"); return +p[2] + " " + short3(+p[1] - 1); };
+    return "по датам · " + f(days[0]) + " – " + f(days[days.length - 1]);
   }
 
-  /* ─────────── Состояние ─────────── */
-  const state = {
-    group: GROUPS[store.get("sched.group")] ? store.get("sched.group") : null,
-    date: startOfDay(new Date()),
-    theme: store.get("sched.theme") || "dark",
+  var state = {
+    group: has(GROUPS, store.get("sched.group")) ? store.get("sched.group") : null,
+    date: today(),
+    theme: store.get("sched.theme") === "light" ? "light" : "dark",
     sheetOpen: false,
+    lessons: [],
   };
 
-  /* ─────────── Иконки ─────────── */
-  const I = {
+  var I = {
     user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
     pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',
     clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
     cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>',
     book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7"/></svg>',
     link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>',
-    hash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 9h14M5 15h14M10 3 8 21M16 3l-2 18"/></svg>',
     sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
     moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
     chev: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>',
   };
 
-  /* ─────────── DOM ─────────── */
-  const $ = id => document.getElementById(id);
-  const el = {
-    picker: $("picker"), schedule: $("schedule"), groupList: $("groupList"),
-    chipName: $("chipName"), chipDot: $("chipDot"), groupChip: $("groupChip"), themeBtn: $("themeBtn"),
-    monthLabel: $("monthLabel"), weekLabel: $("weekLabel"), todayBtn: $("todayBtn"),
-    prevWeek: $("prevWeek"), nextWeek: $("nextWeek"), weekStrip: $("weekStrip"), indicator: $("indicator"),
-    viewport: $("viewport"), overlay: $("overlay"), sheet: $("sheet"),
-  };
+  var $ = function (id) { return document.getElementById(id); };
+  var el = {};
+  ["picker", "schedule", "groupList", "ver", "chipName", "chipDot", "groupChip", "themeBtn", "monthLabel", "weekLabel",
+    "todayBtn", "prevWeek", "nextWeek", "weekStrip", "indicator", "viewport", "overlay", "sheet"].forEach(function (id) { el[id] = $(id); });
+  var isHidden = function (node) { return node.classList.contains("hidden"); };
 
-  /* ─────────── Тема ─────────── */
+  /* ── Тема ── */
   function applyTheme() {
-    document.documentElement.dataset.theme = state.theme;
+    document.documentElement.setAttribute("data-theme", state.theme);
     el.themeBtn.innerHTML = state.theme === "dark" ? I.sun : I.moon;
-    const bg = state.theme === "dark" ? "#07090f" : "#eef1fb";
+    var bg = state.theme === "dark" ? "#07090f" : "#eef1fb";
     document.querySelector('meta[name="theme-color"]').setAttribute("content", bg);
-    if (inTelegram) {
-      try { tg.setHeaderColor(bg); tg.setBackgroundColor(bg); if (tg.setBottomBarColor) tg.setBottomBarColor(bg); } catch (e) {}
-    }
+    if (!TG.available()) return;
+    if (TG.atLeast("6.9")) TG.post("web_app_set_header_color", { color: bg });
+    if (TG.atLeast("6.1")) TG.post("web_app_set_background_color", { color: bg });
+    if (TG.atLeast("7.10")) TG.post("web_app_set_bottom_bar_color", { color: bg });
   }
-  el.themeBtn.addEventListener("click", () => {
+  el.themeBtn.addEventListener("click", function () {
     state.theme = state.theme === "dark" ? "light" : "dark";
     store.set("sched.theme", state.theme);
-    applyTheme(); haptic.tap();
+    applyTheme();
+    haptic.tap();
   });
 
-  /* ─────────── Экран выбора группы ─────────── */
+  /* ── Выбор группы ── */
   function renderPicker() {
-    el.groupList.innerHTML = Object.keys(GROUPS).map((name, i) => `
-      <button class="group-card glass ${name === state.group ? "current" : ""}" data-group="${esc(name)}" style="animation-delay:${i * 70}ms">
-        <span class="badge">${esc(name)}</span>
-        <span class="meta"><b>${esc(name)}</b><span>${esc(GROUPS[name].subtitle || "")}</span><em>${esc(groupStats(name))}</em></span>
-        <span class="chev">${I.chev}</span>
-      </button>`).join("");
+    el.groupList.innerHTML = Object.keys(GROUPS).map(function (name, i) {
+      return '<button class="group-card glass' + (name === state.group ? " current" : "") + '" data-group="' + esc(name) +
+        '" style="animation-delay:' + i * 60 + 'ms"><span class="badge">' + esc(name) + '</span><span class="meta"><b>' + esc(name) +
+        "</b><span>" + esc(GROUPS[name].subtitle || "") + "</span><em>" + esc(groupStats(name)) + '</em></span><span class="chev">' + I.chev + "</span></button>";
+    }).join("");
   }
-  el.groupList.addEventListener("click", e => {
-    const card = e.target.closest("[data-group]");
+  el.groupList.addEventListener("click", function (e) {
+    var card = e.target.closest("[data-group]");
     if (!card) return;
     haptic.tap();
-    state.group = card.dataset.group;
+    state.group = card.getAttribute("data-group");
     store.set("sched.group", state.group);
     showSchedule();
   });
-
   function showPicker() {
     renderPicker();
     el.picker.classList.remove("hidden");
@@ -648,263 +583,218 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
     el.picker.classList.add("hidden");
     el.schedule.classList.remove("hidden");
     renderWeek();
-    renderDay(null);
+    renderDay(0);
     updateBackButton();
   }
-  el.groupChip.addEventListener("click", () => { haptic.tap(); showPicker(); });
+  el.groupChip.addEventListener("click", function () { haptic.tap(); showPicker(); });
 
-  /* ─────────── Неделя ─────────── */
+  /* ── Неделя ── */
   function renderWeek() {
-    const mon = mondayOf(state.date);
-    const today = startOfDay(new Date());
-    const sun = addDays(mon, 6);
-    const m1 = MONTHS[mon.getMonth()], m2 = MONTHS[sun.getMonth()];
-    el.monthLabel.textContent = m1 === m2 ? `${m1} ${sun.getFullYear()}` : `${m1.slice(0,3)} – ${m2.slice(0,3)} ${sun.getFullYear()}`;
-    const diff = Math.round((mon - mondayOf(today)) / (7 * 864e5));
-    const rel = diff === 0 ? "текущая" : diff === 1 ? "следующая" : diff === -1 ? "прошлая"
-      : diff > 0 ? `+${diff} нед.` : `${diff} нед.`;
-    el.weekLabel.textContent = mon.getMonth() === sun.getMonth()
-      ? `${mon.getDate()}–${sun.getDate()} ${MONTHS_GEN[sun.getMonth()].slice(0,3)} · ${rel}`
-      : `${mon.getDate()} ${MONTHS_GEN[mon.getMonth()].slice(0,3)} – ${sun.getDate()} ${MONTHS_GEN[sun.getMonth()].slice(0,3)} · ${rel}`;
-    el.todayBtn.hidden = sameDay(state.date, today);
+    var mon = mondayOf(state.date), sun = addDays(mon, 6), t = today();
+    el.monthLabel.textContent = mon.getMonth() === sun.getMonth()
+      ? MONTHS[sun.getMonth()] + " " + sun.getFullYear()
+      : MONTHS[mon.getMonth()].slice(0, 3) + " – " + MONTHS[sun.getMonth()].slice(0, 3).toLowerCase() + " " + sun.getFullYear();
+    var diff = Math.round((mon - mondayOf(t)) / 6048e5);
+    var rel = diff === 0 ? "текущая" : diff === 1 ? "следующая" : diff === -1 ? "прошлая" : (diff > 0 ? "+" : "") + diff + " нед.";
+    el.weekLabel.textContent = (mon.getMonth() === sun.getMonth()
+      ? mon.getDate() + "–" + sun.getDate() + " " + short3(sun.getMonth())
+      : mon.getDate() + " " + short3(mon.getMonth()) + " – " + sun.getDate() + " " + short3(sun.getMonth())) + " · " + rel;
+    el.todayBtn.hidden = sameDay(state.date, t);
 
-    el.weekStrip.querySelectorAll(".day-btn").forEach(b => b.remove());
-    for (let i = 0; i < 7; i++) {
-      const d = addDays(mon, i);
-      const { lessons, status } = getDay(state.group, d);
-      const b = document.createElement("button");
-      b.className = "day-btn" + (sameDay(d, today) ? " is-today" : "") + (sameDay(d, state.date) ? " active" : "");
-      b.dataset.date = iso(d);
-      b.setAttribute("aria-label", `${DW_FULL[i]}, ${d.getDate()} ${MONTHS_GEN[d.getMonth()]}`);
-      const pips = status === "ok" ? lessons.slice(0, 6).map(l => `<i class="${typeClass(l.type)}"></i>`).join("") : "";
-      b.innerHTML = `<span class="dw">${DW_SHORT[i]}</span><span class="dn">${d.getDate()}</span><span class="pips">${pips}</span>`;
-      el.weekStrip.appendChild(b);
+    var html = "";
+    for (var i = 0; i < 7; i++) {
+      var d = addDays(mon, i), day = getDay(state.group, d);
+      var pips = day.status === "ok" ? day.lessons.slice(0, 6).map(function (l) { return '<i class="' + typeClass(l.type) + '"></i>'; }).join("") : "";
+      html += '<button class="day-btn' + (sameDay(d, t) ? " is-today" : "") + (sameDay(d, state.date) ? " active" : "") +
+        '" data-date="' + iso(d) + '" aria-label="' + DW_FULL[i] + ", " + d.getDate() + " " + MONTHS_GEN[d.getMonth()] + '"><span class="dw">' +
+        DW_SHORT[i] + '</span><span class="dn">' + d.getDate() + '</span><span class="pips">' + pips + "</span></button>";
     }
+    var old = el.weekStrip.querySelectorAll(".day-btn");
+    for (var j = 0; j < old.length; j++) old[j].parentNode.removeChild(old[j]);
+    el.weekStrip.insertAdjacentHTML("beforeend", html);
     moveIndicator();
   }
   function moveIndicator() {
-    const active = el.weekStrip.querySelector(".day-btn.active");
+    var active = el.weekStrip.querySelector(".day-btn.active");
     if (!active) return;
     el.indicator.style.width = active.offsetWidth + "px";
-    el.indicator.style.transform = `translateX(${active.offsetLeft - 6}px)`;
+    el.indicator.style.transform = "translateX(" + active.offsetLeft + "px)";
   }
   window.addEventListener("resize", moveIndicator);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(moveIndicator);
 
-  el.weekStrip.addEventListener("click", e => {
-    const b = e.target.closest(".day-btn");
+  el.weekStrip.addEventListener("click", function (e) {
+    var b = e.target.closest(".day-btn");
     if (!b) return;
-    const [y, m, d] = b.dataset.date.split("-").map(Number);
-    goTo(new Date(y, m - 1, d));
+    var p = b.getAttribute("data-date").split("-");
+    goTo(new Date(+p[0], +p[1] - 1, +p[2]));
   });
-  el.prevWeek.addEventListener("click", () => goTo(addDays(state.date, -7)));
-  el.nextWeek.addEventListener("click", () => goTo(addDays(state.date, 7)));
-  el.todayBtn.addEventListener("click", () => goTo(startOfDay(new Date())));
+  el.prevWeek.addEventListener("click", function () { goTo(addDays(state.date, -7)); });
+  el.nextWeek.addEventListener("click", function () { goTo(addDays(state.date, 7)); });
+  el.todayBtn.addEventListener("click", function () { goTo(today()); });
 
   function goTo(date) {
+    date = startOfDay(date);
     if (sameDay(date, state.date)) return;
-    const dir = date > state.date ? 1 : -1;
-    const weekChanged = !sameDay(mondayOf(date), mondayOf(state.date));
-    state.date = startOfDay(date);
+    var dir = date > state.date ? 1 : -1;
+    var weekChanged = !sameDay(mondayOf(date), mondayOf(state.date));
+    state.date = date;
     haptic.select();
     if (weekChanged) renderWeek();
     else {
-      el.weekStrip.querySelectorAll(".day-btn").forEach(b => b.classList.toggle("active", b.dataset.date === iso(state.date)));
-      el.todayBtn.hidden = sameDay(state.date, startOfDay(new Date()));
+      var btns = el.weekStrip.querySelectorAll(".day-btn");
+      for (var i = 0; i < btns.length; i++) btns[i].classList.toggle("active", btns[i].getAttribute("data-date") === iso(date));
+      el.todayBtn.hidden = sameDay(date, today());
       moveIndicator();
     }
     renderDay(dir);
   }
 
-  /* ─────────── День ─────────── */
-  function lessonHTML(l, i, isToday, nowMin) {
-    const [s, e] = splitTime(l.time);
-    const cls = typeClass(l.type);
-    const sMin = toMin(s), eMin = toMin(e || s);
-    let extra = "", state_ = "";
-    if (isToday && nowMin >= eMin) state_ = "past";
-    if (isToday && nowMin >= sMin && nowMin < eMin) {
-      state_ = "now";
-      const p = Math.round((nowMin - sMin) / (eMin - sMin) * 100);
-      extra = `<div class="progress"><i style="width:${p}%"></i></div>
-               <div class="progress-label"><span>идёт ${nowMin - sMin} мин</span><span>до конца ${eMin - nowMin} мин</span></div>`;
+  /* ── День ── */
+  function lessonHTML(l, i, isToday, now) {
+    var t = splitTime(l.time), s = t[0], e = t[1] || "";
+    var sMin = toMin(s), eMin = e ? toMin(e) : sMin;
+    var mode = "", extra = "";
+    if (isToday && now >= eMin) mode = "past";
+    if (isToday && now >= sMin && now < eMin) {
+      mode = "now";
+      extra = '<div class="progress"><i style="width:' + Math.round((now - sMin) / (eMin - sMin) * 100) + '%"></i></div>' +
+        '<div class="progress-label"><span>идёт ' + fmtDur(now - sMin) + "</span><span>до конца " + fmtDur(eMin - now) + "</span></div>";
     }
-    const info = [
-      l.room ? `<span>${I.pin}${esc(l.room)}</span>` : "",
-      l.teacher ? `<span>${I.user}${esc(l.teacher)}</span>` : "",
-    ].join("");
-    return `
-      <button class="lesson glass ${cls} ${state_}" data-i="${i}" style="animation-delay:${i * 55}ms">
-        <span class="time"><span class="n">${l.num ? esc(l.num) + " пара" : ""}</span><span class="s">${esc(s)}</span><span class="e">${esc(e || "")}</span></span>
-        <span class="body">
-          <span class="tag">${esc(l.type || "занятие")}</span>${state_ === "now" ? '<span class="live">сейчас</span>' : ""}
-          <h3>${esc(l.subject)}</h3>
-          <span class="info">${info}</span>
-        </span>
-        ${extra}
-      </button>`;
+    var info = (l.room ? "<span>" + I.pin + esc(l.room) + "</span>" : "") + (l.teacher ? "<span>" + I.user + esc(l.teacher) + "</span>" : "");
+    return '<button class="lesson glass ' + typeClass(l.type) + " " + mode + '" data-i="' + i + '"><span class="time"><span class="n">' +
+      (l.num ? esc(l.num) + " пара" : "") + '</span><span class="s">' + esc(s) + '</span><span class="e">' + esc(e) + '</span></span><span class="body"><span class="tag">' +
+      esc(l.type || "занятие") + "</span>" + (mode === "now" ? '<span class="live">сейчас</span>' : "") + "<h3>" + esc(l.subject) +
+      '</h3><span class="info">' + info + "</span></span>" + extra + "</button>";
   }
 
-  let currentLessons = [];
-  function dayContentHTML() {
-    const d = state.date;
-    const today = startOfDay(new Date());
-    const isToday = sameDay(d, today);
-    const now = new Date();
-    const nowMin = now.getHours() * 60 + now.getMinutes();
-    const { lessons, status } = getDay(state.group, d);
-    currentLessons = lessons;
-    const head = `${DW_FULL[dayIdx(d)]}, ${d.getDate()} ${MONTHS_GEN[d.getMonth()]}`;
-
-    if (status !== "ok") {
-      const weekend = dayIdx(d) === 6;
-      const [ico, title, text] = status === "free"
-        ? (weekend ? ["🌙", "Выходной", "Воскресенье, пар нет. Можно выдохнуть."] : ["☕", "Пар нет", "В этот день занятий не стоит."])
-        : (weekend ? ["🌙", "Выходной", "На воскресенье расписания нет."]
-                   : ["🛰️", "Нет данных", "Расписание на эту дату ещё не добавлено. Его можно дописать в JSON в начале файла."]);
-      return `<div class="day-summary"><b>${head}</b></div>
-              <div class="empty glass"><div class="ico">${ico}</div><b>${title}</b><p>${text}</p></div>`;
+  function dayHTML() {
+    var d = state.date, isToday = sameDay(d, today()), now = nowMin();
+    var day = getDay(state.group, d), lessons = day.lessons;
+    state.lessons = lessons;
+    var head = DW_FULL[dayIdx(d)] + ", " + d.getDate() + " " + MONTHS_GEN[d.getMonth()];
+    if (day.status !== "ok") {
+      var sunday = dayIdx(d) === 6, c;
+      if (day.status === "free") c = sunday ? ["🌙", "Выходной", "Воскресенье, пар нет."] : ["☕", "Пар нет", "В этот день занятий не стоит."];
+      else c = sunday ? ["🌙", "Выходной", "На воскресенье расписания нет."] : ["🛰️", "Нет данных", "Расписание на эту дату ещё не добавлено."];
+      return '<div class="day-summary"><b>' + head + '</b></div><div class="empty glass"><div class="ico">' + c[0] + "</div><b>" + c[1] + "</b><p>" + c[2] + "</p></div>";
     }
-
-    const first = splitTime(lessons[0].time)[0];
-    const last = splitTime(lessons[lessons.length - 1].time)[1] || "";
-    let html = `<div class="day-summary"><b>${head}</b><span class="mono">${lessons.length} ${plural(lessons.length, "пара", "пары", "пар")} · ${first}–${last}</span></div><div class="lessons">`;
-    lessons.forEach((l, i) => {
+    var first = splitTime(lessons[0].time)[0], last = splitTime(lessons[lessons.length - 1].time)[1] || "";
+    var html = '<div class="day-summary"><b>' + head + '</b><span class="mono">' + lessons.length + " " + plural(lessons.length, "пара", "пары", "пар") +
+      " · " + esc(first) + "–" + esc(last) + '</span></div><div class="lessons">';
+    lessons.forEach(function (l, i) {
       if (i > 0) {
-        const prevEnd = toMin(splitTime(lessons[i - 1].time)[1] || "0:00");
-        const gap = toMin(splitTime(l.time)[0]) - prevEnd;
-        if (gap >= 40) html += `<div class="gap">окно ${gap >= 60 ? Math.floor(gap / 60) + " ч " : ""}${gap % 60 ? gap % 60 + " мин" : ""}</div>`;
+        var prevEnd = splitTime(lessons[i - 1].time)[1];
+        var gap = prevEnd ? toMin(splitTime(l.time)[0]) - toMin(prevEnd) : 0;
+        if (gap >= 40) html += '<div class="gap">окно ' + fmtDur(gap) + "</div>";
       }
-      html += lessonHTML(l, i, isToday, nowMin);
+      html += lessonHTML(l, i, isToday, now);
     });
-    html += `</div>`;
-
+    html += "</div>";
     if (isToday) {
-      const next = lessons.find(l => toMin(splitTime(l.time)[0]) > nowMin);
-      const allDone = nowMin >= toMin(last || "23:59");
-      if (allDone) html += `<div class="next-hint">На сегодня всё 🎉</div>`;
-      else if (next && !lessons.some(l => { const [s, e] = splitTime(l.time); return nowMin >= toMin(s) && nowMin < toMin(e); })) {
-        const m = toMin(splitTime(next.time)[0]) - nowMin;
-        html += `<div class="next-hint">Следующая пара через <b>${m >= 60 ? Math.floor(m / 60) + " ч " : ""}${m % 60} мин</b></div>`;
-      }
+      var running = lessons.some(function (l) { var t = splitTime(l.time); return now >= toMin(t[0]) && t[1] && now < toMin(t[1]); });
+      var next = lessons.filter(function (l) { return toMin(splitTime(l.time)[0]) > now; })[0];
+      if (last && now >= toMin(last)) html += '<div class="next-hint">На сегодня всё 🎉</div>';
+      else if (next && !running) html += '<div class="next-hint">Следующая пара через <b>' + fmtDur(toMin(splitTime(next.time)[0]) - now) + "</b></div>";
     }
     return html;
   }
 
   function renderDay(dir) {
-    const old = el.viewport.querySelector(".day-pane:not(.leaving)");
-    const pane = document.createElement("div");
+    var old = el.viewport.querySelector(".day-pane:not(.leaving)");
+    var pane = document.createElement("div");
     pane.className = "day-pane";
-    pane.innerHTML = dayContentHTML();
+    pane.innerHTML = dayHTML();
     if (old && dir) {
-      old.classList.add("leaving", dir > 0 ? "leave-to-left" : "leave-to-right");
+      old.classList.add("leaving", dir > 0 ? "out-l" : "out-r");
       old.style.transform = "";
-      setTimeout(() => old.remove(), 330);
-      pane.classList.add(dir > 0 ? "enter-from-right" : "enter-from-left");
+      setTimeout(function () { if (old.parentNode) old.parentNode.removeChild(old); }, 230);
+      pane.classList.add(dir > 0 ? "in-r" : "in-l");
     } else if (old) {
-      old.remove();
+      old.parentNode.removeChild(old);
     }
     el.viewport.appendChild(pane);
   }
 
-  // обновление «идёт сейчас» раз в 30 секунд
-  setInterval(() => {
-    if (el.schedule.classList.contains("hidden") || state.sheetOpen) return;
-    const pane = el.viewport.querySelector(".day-pane:not(.leaving)");
-    if (!pane || !sameDay(state.date, startOfDay(new Date()))) return;
-    const top = pane.scrollTop;
-    pane.innerHTML = dayContentHTML();
-    pane.querySelectorAll(".lesson").forEach(x => x.style.animation = "none");
+  // раз в 30 секунд обновляем «идёт сейчас», если открыт сегодняшний день
+  setInterval(function () {
+    if (isHidden(el.schedule) || state.sheetOpen || !sameDay(state.date, today())) return;
+    var pane = el.viewport.querySelector(".day-pane:not(.leaving)");
+    if (!pane) return;
+    var top = pane.scrollTop;
+    pane.innerHTML = dayHTML();
     pane.scrollTop = top;
   }, 30000);
 
-  /* ─────────── Свайпы по дням ─────────── */
-  (() => {
-    let x0 = 0, y0 = 0, dx = 0, tracking = false, horiz = null, pane = null;
-    el.viewport.addEventListener("touchstart", e => {
+  /* ── Свайпы по дням ── */
+  (function () {
+    var x0 = 0, y0 = 0, dx = 0, tracking = false, horiz = null, pane = null;
+    el.viewport.addEventListener("touchstart", function (e) {
       if (e.touches.length !== 1) return;
-      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0;
-      tracking = true; horiz = null;
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0; tracking = true; horiz = null;
       pane = el.viewport.querySelector(".day-pane:not(.leaving)");
     }, { passive: true });
-    el.viewport.addEventListener("touchmove", e => {
+    el.viewport.addEventListener("touchmove", function (e) {
       if (!tracking || !pane) return;
-      const mx = e.touches[0].clientX - x0, my = e.touches[0].clientY - y0;
+      var mx = e.touches[0].clientX - x0, my = e.touches[0].clientY - y0;
       if (horiz === null && (Math.abs(mx) > 8 || Math.abs(my) > 8)) horiz = Math.abs(mx) > Math.abs(my) * 1.2;
       if (!horiz) return;
       dx = mx;
       pane.style.transition = "none";
-      pane.style.transform = `translateX(${dx * 0.6}px)`;
-      pane.style.opacity = String(1 - Math.min(Math.abs(dx) / 600, .4));
+      pane.style.transform = "translateX(" + dx * 0.6 + "px)";
     }, { passive: true });
-    const end = () => {
+    function end() {
       if (!tracking) return;
       tracking = false;
       if (!pane) return;
-      pane.style.transition = "transform .3s cubic-bezier(.2,.8,.2,1), opacity .3s";
-      if (horiz && Math.abs(dx) > 60) {
-        goTo(addDays(state.date, dx < 0 ? 1 : -1));
-      } else {
-        pane.style.transform = ""; pane.style.opacity = "";
-      }
-    };
+      pane.style.transition = "transform .25s ease-out";
+      if (horiz && Math.abs(dx) > 60) goTo(addDays(state.date, dx < 0 ? 1 : -1));
+      else pane.style.transform = "";
+    }
     el.viewport.addEventListener("touchend", end);
     el.viewport.addEventListener("touchcancel", end);
-    // стрелки на клавиатуре — для десктопа Telegram
-    document.addEventListener("keydown", e => {
+    document.addEventListener("keydown", function (e) {
       if (state.sheetOpen) { if (e.key === "Escape") closeSheet(); return; }
-      if (el.schedule.classList.contains("hidden")) return;
+      if (isHidden(el.schedule)) return;
       if (e.key === "ArrowRight") goTo(addDays(state.date, 1));
       if (e.key === "ArrowLeft") goTo(addDays(state.date, -1));
     });
   })();
 
-  /* ─────────── Нижняя панель ─────────── */
-  el.viewport.addEventListener("click", e => {
-    const card = e.target.closest(".lesson");
-    if (!card) return;
-    const l = currentLessons[+card.dataset.i];
-    if (l) openSheet(l);
+  /* ── Нижняя панель ── */
+  el.viewport.addEventListener("click", function (e) {
+    var card = e.target.closest(".lesson");
+    if (card && state.lessons[+card.getAttribute("data-i")]) openSheet(state.lessons[+card.getAttribute("data-i")]);
   });
-
   function row(icon, label, value) {
-    const empty = value === undefined || value === null || String(value).trim() === "";
-    return `<div class="row ${empty ? "muted" : ""}"><span class="ri">${icon}</span><span><small>${label}</small><b>${empty ? "не указано" : esc(value)}</b></span></div>`;
+    var empty = value == null || String(value).trim() === "";
+    return '<div class="row' + (empty ? " muted" : "") + '"><span class="ri">' + icon + "</span><span><small>" + label + "</small><b>" +
+      (empty ? "не указано" : esc(value)) + "</b></span></div>";
   }
-
+  function openLink(url) {
+    if (TG.available() && TG.atLeast("6.1")) TG.post("web_app_open_link", { url: url });
+    else window.open(url, "_blank");
+  }
   function openSheet(l) {
     haptic.tap();
-    const cls = typeClass(l.type);
-    const [s, e] = splitTime(l.time);
-    const dur = e ? toMin(e) - toMin(s) : 0;
-    const d = state.date;
-    el.sheet.className = `sheet glass ${cls}`;
-    el.sheet.innerHTML = `
-      <div class="grabber"></div>
-      <span class="tag">${esc(l.type || "занятие")}</span>
-      <h2>${esc(l.subject)}</h2>
-      ${l.topic ? `<p class="topic">${esc(l.topic)}</p>` : ""}
-      <div class="rows">
-        ${row(I.clock, "Время", `${s}${e ? " – " + e : ""}${dur ? ` · ${dur} мин` : ""}`)}
-        ${row(I.cal, "Дата", `${DW_FULL[dayIdx(d)]}, ${d.getDate()} ${MONTHS_GEN[d.getMonth()]}${l.num ? ` · ${l.num} пара` : ""}`)}
-        ${row(I.user, "Преподаватель", l.teacher)}
-        ${row(I.pin, "Аудитория", l.room)}
-        ${l.link ? row(I.link, "Материалы", l.link.replace(/^https?:\/\//, "")) : ""}
-      </div>
-      <div class="sheet-actions">
-        ${l.link ? `<button class="btn primary" id="openLink">${I.book}Материалы</button>` : ""}
-        <button class="btn ${l.link ? "ghost" : "primary"}" id="closeSheet">Закрыть</button>
-      </div>`;
+    var t = splitTime(l.time), s = t[0], e = t[1] || "", dur = e ? toMin(e) - toMin(s) : 0, d = state.date;
+    var link = /^https?:\/\//i.test(l.link || "") ? l.link : "";
+    el.sheet.className = "sheet " + typeClass(l.type);
+    el.sheet.innerHTML = '<div class="grabber"></div><span class="tag">' + esc(l.type || "занятие") + "</span><h2>" + esc(l.subject) + "</h2>" +
+      (l.topic ? '<p class="topic">' + esc(l.topic) + "</p>" : "") + '<div class="rows">' +
+      row(I.clock, "Время", s + (e ? " – " + e : "") + (dur > 0 ? " · " + dur + " мин" : "")) +
+      row(I.cal, "Дата", DW_FULL[dayIdx(d)] + ", " + d.getDate() + " " + MONTHS_GEN[d.getMonth()] + (l.num ? " · " + l.num + " пара" : "")) +
+      row(I.user, "Преподаватель", l.teacher) + row(I.pin, "Аудитория", l.room) +
+      (link ? row(I.link, "Материалы", link.replace(/^https?:\/\//i, "")) : "") +
+      '</div><div class="sheet-actions">' + (link ? '<button class="btn primary" id="openLink">' + I.book + "Материалы</button>" : "") +
+      '<button class="btn ' + (link ? "ghost" : "primary") + '" id="closeSheet">Закрыть</button></div>';
     el.sheet.scrollTop = 0;
-    requestAnimationFrame(() => { el.sheet.classList.add("open"); el.overlay.classList.add("open"); });
+    el.sheet.style.transform = "";
+    el.sheet.classList.add("open");
+    el.overlay.classList.add("open");
     state.sheetOpen = true;
     updateBackButton();
     $("closeSheet").onclick = closeSheet;
-    const link = $("openLink");
-    if (link) link.onclick = () => {
-      if (inTelegram) { try { tg.openLink(l.link); return; } catch (err) {} }
-      window.open(l.link, "_blank", "noopener");
-    };
+    if (link) $("openLink").onclick = function () { openLink(link); };
   }
   function closeSheet() {
     el.sheet.classList.remove("open");
@@ -914,20 +804,18 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
     updateBackButton();
   }
   el.overlay.addEventListener("click", closeSheet);
-
-  // перетаскивание панели вниз для закрытия
-  (() => {
-    let y0 = 0, dy = 0, drag = false;
-    el.sheet.addEventListener("touchstart", e => {
+  (function () { // свайп панели вниз закрывает её
+    var y0 = 0, dy = 0, drag = false;
+    el.sheet.addEventListener("touchstart", function (e) {
       if (el.sheet.scrollTop > 0) return;
       y0 = e.touches[0].clientY; dy = 0; drag = true;
     }, { passive: true });
-    el.sheet.addEventListener("touchmove", e => {
+    el.sheet.addEventListener("touchmove", function (e) {
       if (!drag) return;
       dy = Math.max(0, e.touches[0].clientY - y0);
-      if (dy > 0) { el.sheet.classList.add("dragging"); el.sheet.style.transform = `translateY(${dy}px)`; }
+      if (dy > 0) { el.sheet.classList.add("dragging"); el.sheet.style.transform = "translateY(" + dy + "px)"; }
     }, { passive: true });
-    el.sheet.addEventListener("touchend", () => {
+    el.sheet.addEventListener("touchend", function () {
       if (!drag) return;
       drag = false;
       el.sheet.classList.remove("dragging");
@@ -935,40 +823,38 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
     });
   })();
 
-  /* ─────────── Кнопка «Назад» Telegram ─────────── */
+  /* ── Кнопка «Назад» Telegram ── */
+  var backVisible = null;
   function updateBackButton() {
-    if (!inTelegram || !tg.BackButton) return;
-    try {
-      const needed = state.sheetOpen || (!el.picker.classList.contains("hidden") && state.group);
-      needed ? tg.BackButton.show() : tg.BackButton.hide();
-    } catch (e) {}
+    if (!TG.available() || !TG.atLeast("6.1")) return;
+    var need = state.sheetOpen || (!isHidden(el.picker) && !!state.group);
+    if (need === backVisible) return;
+    backVisible = need;
+    TG.post("web_app_setup_back_button", { is_visible: need });
   }
-  function initTelegram() {
-    const w = window.Telegram && window.Telegram.WebApp;
-    if (!w || !w.platform || w.platform === "unknown") return;
-    tg = w; inTelegram = true;
-    try {
-      tg.ready();
-      tg.expand();
-      if (tg.disableVerticalSwipes) tg.disableVerticalSwipes(); // чтобы свайп вниз в панели не закрывал приложение
-      if (tg.BackButton) tg.BackButton.onClick(() => {
-        if (state.sheetOpen) closeSheet();
-        else if (state.group) showSchedule();
-      });
-    } catch (e) {}
-    applyTheme();
-    updateBackButton();
-  }
+  TG.on("back_button_pressed", function () {
+    if (state.sheetOpen) closeSheet();
+    else if (state.group) showSchedule();
+  });
 
-  /* ─────────── Старт ─────────── */
-  // сначала показываем приложение, потом подключаем Telegram
+  /* ── Безопасные зоны Telegram (вырез, кнопки поверх приложения) ── */
+  TG.on("content_safe_area_changed", function (d) {
+    if (!d) return;
+    var r = document.documentElement.style;
+    r.setProperty("--tg-top", (+d.top || 0) + "px");
+    r.setProperty("--tg-bottom", (+d.bottom || 0) + "px");
+  });
+
+  /* ── Старт: сначала рисуем, потом сообщаем Telegram, что готовы ── */
+  el.ver.textContent = "версия " + APP_VERSION;
   applyTheme();
   if (state.group) showSchedule(); else showPicker();
-  const sdk = document.createElement("script");
-  sdk.src = "https://telegram.org/js/telegram-web-app.js";
-  sdk.async = true;
-  sdk.onload = initTelegram;
-  document.head.appendChild(sdk);
+  if (TG.available()) {
+    TG.post("web_app_ready");
+    TG.post("web_app_expand");
+    if (TG.atLeast("7.7")) TG.post("web_app_setup_swipe_behavior", { allow_vertical_swipe: false });
+    if (TG.atLeast("8.0")) TG.post("web_app_request_content_safe_area");
+  }
 })();
 </script>
 </body>
