@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="boot">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -116,7 +116,7 @@
   --lec:#34d399;--lec-rgb:52,211,153;--prac:#fbbf24;--prac-rgb:251,191,36;
   --lab:#a78bfa;--lab-rgb:167,139,250;--other:#60a5fa;--other-rgb:96,165,250;
   --r-lg:22px;--r-md:16px;
-  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-top:0px;--safe-bottom:0px;
   --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,"Roboto Mono",Menlo,monospace;
 }
@@ -129,6 +129,7 @@
   --lec:#047857;--lec-rgb:4,120,87;--prac:#b45309;--prac-rgb:180,83,9;
   --lab:#7c3aed;--lab-rgb:124,58,237;--other:#2563eb;--other-rgb:37,99,235;
 }
+@supports (padding:env(safe-area-inset-top,0px)){:root{--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}}
 @supports (padding:max(0px,1px)){:root{
   --safe-top:calc(max(env(safe-area-inset-top,0px),var(--tg-sa-top,0px)) + var(--tg-top,0px));
   --safe-bottom:calc(max(env(safe-area-inset-bottom,0px),var(--tg-sa-bottom,0px)) + var(--tg-bottom,0px))}}
@@ -192,7 +193,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .group-card .chev{color:var(--text-3);flex:none}
 .group-card.current{border-color:rgba(124,92,255,.65)}
 .ver{margin-top:22px;text-align:center;font:11px var(--mono);color:var(--text-3)}
-@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.boot .screen{transition:none!important}
+.lite .bg:before{animation:none;will-change:auto}
 
 /* Расписание */
 .topbar{display:flex;align-items:center}
@@ -344,9 +347,15 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 window.onerror = function (msg, src, line) {
   var box = document.getElementById("err");
   if (box) { box.style.display = "block"; box.textContent = "Ошибка: " + msg + (line ? " (строка " + line + ")" : ""); }
+  if (window.__tgReadySent) return;
   try { // всё равно убираем заставку Telegram, чтобы ошибку было видно
-    if (window.TelegramWebviewProxy) window.TelegramWebviewProxy.postEvent("web_app_ready", '""');
-    else if (window.parent && window.parent !== window) window.parent.postMessage('{"eventType":"web_app_ready","eventData":""}', "*");
+    var tgHash = /tgWebAppVersion=/.test(location.hash);
+    try { tgHash = tgHash || /tgWebAppVersion/.test(sessionStorage.getItem("tgParams") || ""); } catch (e) {}
+    if (window.TelegramWebviewProxy) { window.__tgReadySent = true; window.TelegramWebviewProxy.postEvent("web_app_ready", '""'); }
+    else if (tgHash && window.parent && window.parent !== window) {
+      window.__tgReadySent = true;
+      window.parent.postMessage('{"eventType":"web_app_ready","eventData":""}', "*");
+    }
   } catch (e) {}
 };
 </script>
@@ -395,7 +404,7 @@ window.onerror = function (msg, src, line) {
 <script>
 (function () {
   "use strict";
-  var APP_VERSION = "2.1";
+  var APP_VERSION = "2.2";
 
   /* ── Мост к Telegram без внешнего SDK ──
      Тот же протокол, что в официальном telegram-web-app.js: события уходят через
@@ -747,7 +756,7 @@ window.onerror = function (msg, src, line) {
     var reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     if (old && dir && !reduce) {
       old.classList.add("leaving", dir > 0 ? "out-l" : "out-r");
-      old.style.transform = "";
+      old.style.transition = "none"; // уходит с того места, где его отпустил палец
       setTimeout(function () { if (old.parentNode) old.parentNode.removeChild(old); }, 230);
       pane.classList.add(dir > 0 ? "in-r" : "in-l");
     } else if (old) {
@@ -761,9 +770,14 @@ window.onerror = function (msg, src, line) {
   function checkDay() {
     var t = today();
     if (iso(t) === lastDay) return false;
-    if (iso(state.date) === lastDay) state.date = t;
+    var moved = iso(state.date) === lastDay;
+    if (moved) state.date = t;
     lastDay = iso(t);
-    if (!isHidden(el.schedule)) { renderWeek(); renderDay(0); }
+    if (isHidden(el.schedule)) return true;
+    renderWeek();
+    var pane = el.viewport.querySelector(".day-pane:not(.leaving)");
+    if (moved || !pane) renderDay(0);
+    else { var top = pane.scrollTop; pane.classList.remove("stagger"); pane.innerHTML = dayHTML(); pane.scrollTop = top; }
     return true;
   }
   // раз в 30 секунд обновляем «идёт сейчас», если открыт сегодняшний день
@@ -838,7 +852,12 @@ window.onerror = function (msg, src, line) {
     haptic.tap();
     var t = splitTime(l.time), s = t[0], e = t[1] || "", dur = e ? toMin(e) - toMin(s) : 0, d = state.date;
     var raw = String(l.link || "").trim();
-    var link = /^https?:\/\//i.test(raw) ? raw : /^[\w-]+(\.[\w-]+)+(\/|$)/.test(raw) ? "https://" + raw : "";
+    var link = /^https?:\/\//i.test(raw) ? raw : /^[^\s\/:?#.]+(\.[^\s\/:?#.]+)+([\/?#:]|$)/.test(raw) ? "https://" + raw : "";
+    if (link) { // нормализуем как официальный SDK: пробелы и кириллица кодируются
+      var a = document.createElement("a");
+      a.href = link;
+      link = /^https?:$/.test(a.protocol) ? a.href : "";
+    }
     el.sheet.className = "sheet " + typeClass(l.type);
     el.sheet.innerHTML = '<div class="grabber"></div><span class="tag">' + esc(l.type || "занятие") + "</span><h2>" + esc(l.subject) + "</h2>" +
       (l.topic ? '<p class="topic">' + esc(l.topic) + "</p>" : "") + '<div class="rows">' +
@@ -903,24 +922,28 @@ window.onerror = function (msg, src, line) {
     return function (d) {
       if (!d) return;
       var r = document.documentElement.style;
-      r.setProperty(top, (+d.top || 0) + "px");
-      r.setProperty(bottom, (+d.bottom || 0) + "px");
+      if (d.top != null) r.setProperty(top, (+d.top || 0) + "px");
+      if (d.bottom != null) r.setProperty(bottom, (+d.bottom || 0) + "px");
     };
   }
   TG.on("safe_area_changed", insets("--tg-sa-top", "--tg-sa-bottom"));       // вырез и системные панели
   TG.on("content_safe_area_changed", insets("--tg-top", "--tg-bottom"));     // кнопки Telegram в полноэкранном режиме
 
   /* ── Старт: сначала рисуем, после первого кадра сообщаем Telegram, что готовы ── */
-  var readySent = false;
+  var started = false;
   function signalReady() {
-    if (readySent || !TG.available()) return;
-    readySent = true;
-    TG.post("web_app_ready");
+    document.documentElement.classList.remove("boot"); // первый кадр уже нарисован, включаем переходы
+    if (started || !TG.available()) return;
+    started = true;
+    if (!window.__tgReadySent) { window.__tgReadySent = true; TG.post("web_app_ready"); }
     TG.post("web_app_expand");
     if (TG.atLeast("7.7")) TG.post("web_app_setup_swipe_behavior", { allow_vertical_swipe: false });
     if (TG.atLeast("8.0")) { TG.post("web_app_request_safe_area"); TG.post("web_app_request_content_safe_area"); }
   }
   try {
+    // на слабых устройствах фон не анимируем
+    if ((navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) || (navigator.deviceMemory && navigator.deviceMemory <= 2))
+      document.documentElement.classList.add("lite");
     el.ver.textContent = "версия " + APP_VERSION;
     applyTheme();
     if (state.group) showSchedule(); else showPicker();
