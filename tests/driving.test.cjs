@@ -41,3 +41,29 @@ test('personal transfer round-trips and repeated import keeps local progress and
   assert.equal(D.validLesson({ ...incoming.lessons[0], date: '2027-02-30' }), false);
   assert.equal(D.validLesson({ ...incoming.lessons[0], end: '09:59' }), false);
 });
+
+test('school transfer adds Cyrillic contacts and balances without replacing existing progress or lessons', () => {
+  const previous = example();
+  const olderCode = D.encode(previous);
+  assert.match(olderCode, /^drive1\./);
+  const school = {
+    balances: { practice: 12.5, roadExam: 1, internalExam: null },
+    instructor: { name: 'Анна Ивановна', phone: '+7 (900) 000-00-00' },
+    vehicle: { name: 'Учебная машина', plate: 'А123БВ 77' },
+    manager: { name: 'Менеджер', phone: '' }
+  };
+  const update = { ...example(), school };
+  const code = D.encode(update);
+  assert.match(code, /^drive2\./);
+  assert.deepEqual(D.decode(code), update);
+  previous.progress.sessions = 6;
+  previous.lessons[0].done = true;
+  const merged = D.merge(previous, D.decode(code));
+  assert.deepEqual(merged.progress, previous.progress);
+  assert.deepEqual(merged.lessons, previous.lessons);
+  assert.deepEqual(merged.school, school);
+  assert.deepEqual(D.merge(merged, D.decode(olderCode)).school, school);
+  assert.equal(D.phoneHref(school.instructor.phone), 'tel:+79000000000');
+  assert.equal(D.phoneHref('javascript:123456789'), '');
+  assert.equal(D.validSchool({ ...school, balances: { ...school.balances, practice: -1 } }), false);
+});
