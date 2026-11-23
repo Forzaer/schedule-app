@@ -30,7 +30,10 @@
     chart:'<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>',
     close:'<path d="m6 6 12 12M6 18 18 6"/>', check:'<path d="m5 12 4 4L19 6"/>',
     book:'<path d="M4 4h6l2 2 2-2h6v15h-6l-2 2-2-2H4zM12 6v15"/>',
-    spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/>'
+    spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/>',
+    car:'<path d="m5 11 1.7-4.5A2 2 0 0 1 8.6 5h6.8a2 2 0 0 1 1.9 1.5L19 11m-14 0a2 2 0 0 0-2 2v4h18v-4a2 2 0 0 0-2-2H5zm0 6v2m14-2v2M7 14h1m8 0h1"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    edit:'<path d="m14 5 5 5M4 20l4.5-1 11-11a2.1 2.1 0 0 0-3-3l-11 11L4 20z"/>'
   };
   const icon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.book}</svg>`;
   const fillIcons = root => root.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = icon(el.dataset.icon); });
@@ -39,13 +42,15 @@
   try { const parsed = JSON.parse(read('sched.favorites', '[]')); favorites = Array.isArray(parsed) ? parsed.filter(f => f && typeof f.key === 'string' && typeof f.group === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(f.date)) : []; } catch (_) { favorites = []; }
   const storedGroup = read('sched.group', '');
   const query = new URLSearchParams(location.search);
+  const drivingLink = location.hash.startsWith('#driving=') ? location.hash.slice(9) : '';
   const requestedDate = query.get('date');
   const validDate = /^\d{4}-\d{2}-\d{2}$/.test(requestedDate || '') && C.iso(C.parse(requestedDate)) === requestedDate;
   const state = {
     group: data.groups[query.get('group')] ? query.get('group') : data.groups[storedGroup] ? storedGroup : 'ИБО-24',
     date: validDate ? requestedDate : C.moscowNow().key,
     filter: ['all','main','cbi'].includes(read('sched.filter','all')) ? read('sched.filter','all') : 'all',
-    view:'schedule', query:'', theme:read('sched.theme', 'dark') === 'light' ? 'light' : 'dark',
+    view:query.get('view') === 'driving' || drivingLink ? 'driving' : 'schedule',
+    query:'', theme:read('sched.theme', 'dark') === 'light' ? 'light' : 'dark',
     favorites, rendered:[], dialogKind:null, calendarMonth:null, dialogLesson:null
   };
   if (state.group === 'МК1') state.filter = 'all';
@@ -150,6 +155,20 @@
     $('notice').innerHTML = notices;
   }
   function render() {
+    const isDriving = state.view === 'driving';
+    $('academic-view').hidden = isDriving;
+    $('driving-view').hidden = !isDriving;
+    $('group-switch').hidden = isDriving;
+    document.querySelectorAll('[data-view]').forEach(b => {
+      b.classList.toggle('active', b.dataset.view === state.view);
+      if (b.dataset.view === state.view) b.setAttribute('aria-current', 'page');
+      else b.removeAttribute('aria-current');
+    });
+    if (isDriving) {
+      $('breadcrumb').textContent = 'Вождение';
+      driving.render();
+      return;
+    }
     $('group-name').textContent = state.group;
     $('group-avatar').textContent = state.group === 'МК1' ? 'МК' : 'ИБ';
     $('breadcrumb').textContent = state.view === 'saved' ? 'Избранное' : 'Расписание';
@@ -158,7 +177,6 @@
     $('current-date').textContent = shortDate(C.moscowNow().key);
     $('hero').hidden = state.view === 'saved';
     $('cbi-card').hidden = state.group !== 'ИБО-24';
-    document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === state.view));
     document.querySelectorAll('[data-filter]').forEach(b => { b.classList.toggle('active', b.dataset.filter === state.filter); b.setAttribute('aria-pressed', b.dataset.filter === state.filter); b.hidden = state.group === 'МК1' && b.dataset.filter === 'cbi'; });
     $('week-strip').hidden = state.view === 'saved';
     document.querySelector('.week-heading').hidden = state.view === 'saved';
@@ -233,7 +251,7 @@
   document.querySelector('.brand').addEventListener('click', e => { e.preventDefault(); state.view='schedule'; render(); });
   dialog.addEventListener('cancel', e => { e.preventDefault(); closeDialog(); });
   dialog.addEventListener('click', e => { if (e.target === dialog) { const r=dialog.getBoundingClientRect(); if (e.clientX<r.left || e.clientX>r.right || e.clientY<r.top || e.clientY>r.bottom) closeDialog(); } });
-  document.addEventListener('keydown', e => { if(e.key==='/' && !dialog.open && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) { e.preventDefault(); $('search').focus(); } });
+  document.addEventListener('keydown', e => { if(e.key==='/' && state.view !== 'driving' && !dialog.open && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) { e.preventDefault(); $('search').focus(); } });
   let touchStart = null;
   $('lessons').addEventListener('touchstart', e => { if(e.touches.length===1) touchStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; },{passive:true});
   $('lessons').addEventListener('touchend', e => { if(!touchStart || state.view!=='schedule' || dialog.open) return; const dx=e.changedTouches[0].clientX-touchStart.x,dy=e.changedTouches[0].clientY-touchStart.y; touchStart=null; if(Math.abs(dx)>75 && Math.abs(dx)>Math.abs(dy)*1.7) goTo(C.iso(C.addDays(C.parse(state.date),dx<0?1:-1))); },{passive:true});
@@ -244,10 +262,32 @@
   TG.on('safe_area_changed',d => safeArea('hardware',d));
   TG.on('theme_changed', d => { if(!read('sched.theme','') && d?.theme_params?.bg_color) { const hex=d.theme_params.bg_color.replace('#',''); state.theme=parseInt(hex.slice(0,2),16)>150?'light':'dark'; applyTheme(); } });
   if(TG.available()) { TG.post('web_app_ready'); TG.post('web_app_expand'); if(TG.atLeast('8.0')) { TG.post('web_app_request_safe_area'); TG.post('web_app_request_content_safe_area'); } }
+  const driving = window.ScheduleDrivingUI.mount({
+    container: $('driving-view'), dialog, openDialog, closeDialog, toast, icon, escape: esc
+  });
   applyTheme(); render();
-  if(!storedGroup && !query.get('group')) showGroups();
+  if (drivingLink) {
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (_) {}
+    driving.showImport(drivingLink);
+  } else if (state.view === 'schedule' && !storedGroup && !query.get('group')) showGroups();
   let lastToday = C.moscowNow().key;
-  function tick() { const now=C.moscowNow(); if(now.key!==lastToday){ if(state.date===lastToday) state.date=now.key;lastToday=now.key; if(!dialog.open && !document.hidden) { render(); return; } } if(!dialog.open && !document.hidden) { renderHero(); renderLessons(); $('current-date').textContent=shortDate(now.key); } }
+  function tick() {
+    const now = C.moscowNow();
+    const changedDay = now.key !== lastToday;
+    if (changedDay) {
+      if (state.date === lastToday) state.date = now.key;
+      lastToday = now.key;
+    }
+    if (dialog.open || document.hidden) return;
+    if (state.view === 'driving') {
+      if (!$('driving-view').contains(document.activeElement)) driving.render();
+      return;
+    }
+    if (changedDay) { render(); return; }
+    renderHero();
+    renderLessons();
+    $('current-date').textContent = shortDate(now.key);
+  }
   setInterval(tick,30000);
   document.addEventListener('visibilitychange', () => { document.documentElement.classList.toggle('paused',document.hidden); if(!document.hidden) tick(); });
 })();

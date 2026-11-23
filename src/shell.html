@@ -17,6 +17,7 @@
       <button data-view="schedule" class="active"><span data-icon="calendar"></span><span>Расписание</span></button>
       <button data-action="groups"><span data-icon="groups"></span><span>Мои группы</span><span class="nav-count">2</span></button>
       <button data-view="saved"><span data-icon="bookmark"></span><span>Избранное</span></button>
+      <button data-view="driving" aria-label="Вождение"><span data-icon="car"></span><span>Вождение</span></button>
       <button data-action="sources"><span data-icon="layers"></span><span>Источники</span></button>
     </nav>
     <div class="sidebar-note"><span class="tiny-label">МЕНЬШЕ ХАОСА</span><p>Больше времени<br>на важное.</p><div class="note-line"></div><span>Все пары в одном месте</span></div>
@@ -29,6 +30,7 @@
       <div class="top-actions"><button id="theme" class="icon-button" aria-label="Переключить тему"></button><button id="group-switch" class="group-switch" data-action="groups"><span class="group-avatar" id="group-avatar">ИБ</span><span id="group-name">ИБО-24</span><span data-icon="chevronDown"></span></button></div>
     </header>
     <main id="main">
+      <div id="academic-view">
       <div class="page-heading"><div><div class="eyebrow" id="eyebrow">ТВОЙ ДЕНЬ ПОД КОНТРОЛЕМ</div><h1 id="page-title">Всё по расписанию<span>.</span></h1><p id="page-subtitle">Выбирай день. Остальное уже здесь.</p></div><div class="date-tag"><span data-icon="clock"></span><span id="current-date"></span><span class="timezone">МСК</span></div></div>
       <section id="hero" class="hero glass" aria-label="Ближайшее занятие"></section>
       <div class="content-grid">
@@ -47,15 +49,19 @@
         </aside>
       </div>
       <footer class="page-footer"><span>Учись в своём ритме.</span><span>МК1 · ИБО-24 <span class="footer-dot">/</span> Время по Москве</span></footer>
+      </div>
+      <section id="driving-view" aria-labelledby="driving-title" hidden></section>
     </main>
   </div>
-  <nav class="mobile-nav" aria-label="Основная навигация"><button class="active" data-view="schedule"><span data-icon="calendar"></span>Расписание</button><button data-action="groups"><span data-icon="groups"></span>Группы</button><button data-view="saved"><span data-icon="bookmark"></span>Избранное</button><button data-action="sources"><span data-icon="layers"></span>Источники</button></nav>
+  <nav class="mobile-nav" aria-label="Основная навигация"><button class="active" data-view="schedule"><span data-icon="calendar"></span>Расписание</button><button data-action="groups"><span data-icon="groups"></span>Группы</button><button data-view="saved"><span data-icon="bookmark"></span>Избранное</button><button data-view="driving"><span data-icon="car"></span>Вождение</button><button data-action="sources"><span data-icon="layers"></span>Источники</button></nav>
   <dialog id="dialog" aria-labelledby="dialog-title"><div class="dialog-header"><span class="eyebrow">ТВОЁ ПРОСТРАНСТВО</span><button class="icon-button" data-action="close" aria-label="Закрыть"><span data-icon="close"></span></button></div><div id="dialog-content"></div></dialog>
   <div id="toast" role="status"></div>
   <noscript><div class="noscript">Для интерактивного расписания включите JavaScript.</div></noscript>
   <script id="schedule-data" type="application/json">/* DATA */</script>
   <script>/* TELEGRAM */</script>
   <script>/* CORE */</script>
+  <script>/* DRIVING */</script>
+  <script>/* DRIVING_UI */</script>
   <script>/* APP */</script>
 </body>
 </html>

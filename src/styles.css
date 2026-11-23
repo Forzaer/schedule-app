@@ -20,3 +20,62 @@ dialog{padding:24px;border:1px solid var(--line);color:var(--text);background:va
 /* Let the timetable appear early while the next class remains easy to scan. */
 .hero{min-height:188px;padding-top:23px;padding-bottom:23px;margin-bottom:26px}.hero-orbit{transform:rotate(-28deg) scale(.85)}
 @media(max-width:600px){.hero{min-height:185px;padding:20px;margin-bottom:22px}.hero-content{max-width:100%}.hero h2{font-size:1.2rem;margin:8px 0}.hero-bottom{margin-top:11px}.hero-orbit{right:-115px;top:-6px;opacity:.25}.page-heading{margin-bottom:20px}main{padding-top:22px}.schedule-toolbar{margin-bottom:16px}.week-strip{margin-bottom:20px}}
+.drive-heading { margin-bottom: 30px; }
+.drive-heading .drive-add { width: auto; min-height: 44px; margin: 0; padding: 9px 15px; }
+.drive-add svg { width: 18px; height: 18px; }
+.drive-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(230px, 300px); gap: 28px; }
+.drive-grid h2 { margin: 0 0 12px; font-size: 1rem; font-weight: 600; }
+.drive-history { margin-top: 27px; }
+.drive-list { display: grid; gap: 9px; }
+.drive-lesson { width: 100%; display: grid; grid-template-columns: 42px minmax(0, 1fr) 18px; align-items: center; gap: 13px; padding: 16px; border-radius: 13px; text-align: left; }
+.drive-lesson:hover { border-color: var(--mint); }
+.drive-lesson.drive-next {
+  min-height: 125px;
+  padding: 20px;
+  background: linear-gradient(110deg, var(--surface-solid), var(--mint-soft));
+  border-color: color-mix(in srgb, var(--mint) 28%, var(--line));
+}
+.drive-lesson-icon { display: grid; place-items: center; height: 42px; width: 42px; border-radius: 11px; background: var(--mint-soft); color: var(--mint); }
+.drive-lesson-content { min-width: 0; display: grid; gap: 3px; }
+.drive-lesson-content strong { font-size: 1rem; font-weight: 600; }
+.drive-next .drive-lesson-content strong { font-size: 1.18rem; }
+.drive-time { font-variant-numeric: tabular-nums; color: var(--mint); font-size: .875rem; }
+.drive-booking { color: var(--muted); font-size: .875rem; }
+.drive-more svg { width: 16px; color: var(--muted); }
+.drive-empty { padding: 19px 21px; border-radius: 13px; }
+.drive-empty p { margin-top: 5px; font-size: .875rem; color: var(--muted); }
+.drive-progress { padding: 17px; border-radius: 14px; }
+.drive-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 9px; }
+.drive-panel-header h2 { margin: 0; }
+.drive-metrics { margin: 12px 0 0; }
+.drive-metrics > div { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.drive-metrics dt { color: var(--muted); font-size: .875rem; }
+.drive-metrics dd { margin: 0; font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.drive-meter { display: block; width: 100%; height: 10px; accent-color: var(--mint); margin-top: 17px; }
+.drive-meter-note { font-size: .875rem; color: var(--muted); margin-top: 11px; }
+.drive-transfer { margin-top: 14px; font-size: .875rem; color: var(--muted); }
+.drive-transfer .secondary-button { min-height: 44px; margin: 8px 5px 0 0; }
+.drive-form { display: grid; gap: 13px; }
+.drive-form label { display: grid; gap: 5px; font-size: .875rem; min-width: 0; }
+.drive-form input:not([type=checkbox]), .drive-form select, .drive-form textarea {
+  font: inherit; font-size: 1rem; color: var(--text);
+  min-width: 0; min-height: 44px; width: 100%; padding: 7px 9px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--bg);
+}
+.drive-form textarea { resize: vertical; overflow-wrap: anywhere; }
+.drive-form-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.drive-form .drive-check { display: flex; align-items: center; gap: 8px; min-height: 38px; }
+.drive-check input { width: 18px; height: 18px; accent-color: var(--mint); }
+.drive-error { color: var(--text); font-size: .875rem; border-left: 2px solid #df956a; padding-left: 9px; }
+.drive-error:empty { display: none; }
+.drive-form .primary-button { margin-top: 3px; }
+.drive-remove { min-height: 44px; justify-self: start; }
+@media(max-width: 780px) {
+  .drive-grid { grid-template-columns: 1fr; gap: 24px; }
+}
+@media(max-width: 600px) {
+  .drive-heading { align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+  .drive-heading .drive-add { width: 100%; margin: 0; }
+  .drive-lesson.drive-next { min-height: 108px; padding: 16px 13px; }
+  .drive-lesson { padding: 13px; }
+}

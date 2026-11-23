@@ -28,6 +28,65 @@ dialog{padding:24px;border:1px solid var(--line);color:var(--text);background:va
 /* Let the timetable appear early while the next class remains easy to scan. */
 .hero{min-height:188px;padding-top:23px;padding-bottom:23px;margin-bottom:26px}.hero-orbit{transform:rotate(-28deg) scale(.85)}
 @media(max-width:600px){.hero{min-height:185px;padding:20px;margin-bottom:22px}.hero-content{max-width:100%}.hero h2{font-size:1.2rem;margin:8px 0}.hero-bottom{margin-top:11px}.hero-orbit{right:-115px;top:-6px;opacity:.25}.page-heading{margin-bottom:20px}main{padding-top:22px}.schedule-toolbar{margin-bottom:16px}.week-strip{margin-bottom:20px}}
+.drive-heading { margin-bottom: 30px; }
+.drive-heading .drive-add { width: auto; min-height: 44px; margin: 0; padding: 9px 15px; }
+.drive-add svg { width: 18px; height: 18px; }
+.drive-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(230px, 300px); gap: 28px; }
+.drive-grid h2 { margin: 0 0 12px; font-size: 1rem; font-weight: 600; }
+.drive-history { margin-top: 27px; }
+.drive-list { display: grid; gap: 9px; }
+.drive-lesson { width: 100%; display: grid; grid-template-columns: 42px minmax(0, 1fr) 18px; align-items: center; gap: 13px; padding: 16px; border-radius: 13px; text-align: left; }
+.drive-lesson:hover { border-color: var(--mint); }
+.drive-lesson.drive-next {
+  min-height: 125px;
+  padding: 20px;
+  background: linear-gradient(110deg, var(--surface-solid), var(--mint-soft));
+  border-color: color-mix(in srgb, var(--mint) 28%, var(--line));
+}
+.drive-lesson-icon { display: grid; place-items: center; height: 42px; width: 42px; border-radius: 11px; background: var(--mint-soft); color: var(--mint); }
+.drive-lesson-content { min-width: 0; display: grid; gap: 3px; }
+.drive-lesson-content strong { font-size: 1rem; font-weight: 600; }
+.drive-next .drive-lesson-content strong { font-size: 1.18rem; }
+.drive-time { font-variant-numeric: tabular-nums; color: var(--mint); font-size: .875rem; }
+.drive-booking { color: var(--muted); font-size: .875rem; }
+.drive-more svg { width: 16px; color: var(--muted); }
+.drive-empty { padding: 19px 21px; border-radius: 13px; }
+.drive-empty p { margin-top: 5px; font-size: .875rem; color: var(--muted); }
+.drive-progress { padding: 17px; border-radius: 14px; }
+.drive-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 9px; }
+.drive-panel-header h2 { margin: 0; }
+.drive-metrics { margin: 12px 0 0; }
+.drive-metrics > div { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.drive-metrics dt { color: var(--muted); font-size: .875rem; }
+.drive-metrics dd { margin: 0; font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.drive-meter { display: block; width: 100%; height: 10px; accent-color: var(--mint); margin-top: 17px; }
+.drive-meter-note { font-size: .875rem; color: var(--muted); margin-top: 11px; }
+.drive-transfer { margin-top: 14px; font-size: .875rem; color: var(--muted); }
+.drive-transfer .secondary-button { min-height: 44px; margin: 8px 5px 0 0; }
+.drive-form { display: grid; gap: 13px; }
+.drive-form label { display: grid; gap: 5px; font-size: .875rem; min-width: 0; }
+.drive-form input:not([type=checkbox]), .drive-form select, .drive-form textarea {
+  font: inherit; font-size: 1rem; color: var(--text);
+  min-width: 0; min-height: 44px; width: 100%; padding: 7px 9px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--bg);
+}
+.drive-form textarea { resize: vertical; overflow-wrap: anywhere; }
+.drive-form-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.drive-form .drive-check { display: flex; align-items: center; gap: 8px; min-height: 38px; }
+.drive-check input { width: 18px; height: 18px; accent-color: var(--mint); }
+.drive-error { color: var(--text); font-size: .875rem; border-left: 2px solid #df956a; padding-left: 9px; }
+.drive-error:empty { display: none; }
+.drive-form .primary-button { margin-top: 3px; }
+.drive-remove { min-height: 44px; justify-self: start; }
+@media(max-width: 780px) {
+  .drive-grid { grid-template-columns: 1fr; gap: 24px; }
+}
+@media(max-width: 600px) {
+  .drive-heading { align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+  .drive-heading .drive-add { width: 100%; margin: 0; }
+  .drive-lesson.drive-next { min-height: 108px; padding: 16px 13px; }
+  .drive-lesson { padding: 13px; }
+}
 </style>
 </head>
 <body>
@@ -39,6 +98,7 @@ dialog{padding:24px;border:1px solid var(--line);color:var(--text);background:va
       <button data-view="schedule" class="active"><span data-icon="calendar"></span><span>Расписание</span></button>
       <button data-action="groups"><span data-icon="groups"></span><span>Мои группы</span><span class="nav-count">2</span></button>
       <button data-view="saved"><span data-icon="bookmark"></span><span>Избранное</span></button>
+      <button data-view="driving" aria-label="Вождение"><span data-icon="car"></span><span>Вождение</span></button>
       <button data-action="sources"><span data-icon="layers"></span><span>Источники</span></button>
     </nav>
     <div class="sidebar-note"><span class="tiny-label">МЕНЬШЕ ХАОСА</span><p>Больше времени<br>на важное.</p><div class="note-line"></div><span>Все пары в одном месте</span></div>
@@ -51,6 +111,7 @@ dialog{padding:24px;border:1px solid var(--line);color:var(--text);background:va
       <div class="top-actions"><button id="theme" class="icon-button" aria-label="Переключить тему"></button><button id="group-switch" class="group-switch" data-action="groups"><span class="group-avatar" id="group-avatar">ИБ</span><span id="group-name">ИБО-24</span><span data-icon="chevronDown"></span></button></div>
     </header>
     <main id="main">
+      <div id="academic-view">
       <div class="page-heading"><div><div class="eyebrow" id="eyebrow">ТВОЙ ДЕНЬ ПОД КОНТРОЛЕМ</div><h1 id="page-title">Всё по расписанию<span>.</span></h1><p id="page-subtitle">Выбирай день. Остальное уже здесь.</p></div><div class="date-tag"><span data-icon="clock"></span><span id="current-date"></span><span class="timezone">МСК</span></div></div>
       <section id="hero" class="hero glass" aria-label="Ближайшее занятие"></section>
       <div class="content-grid">
@@ -69,9 +130,11 @@ dialog{padding:24px;border:1px solid var(--line);color:var(--text);background:va
         </aside>
       </div>
       <footer class="page-footer"><span>Учись в своём ритме.</span><span>МК1 · ИБО-24 <span class="footer-dot">/</span> Время по Москве</span></footer>
+      </div>
+      <section id="driving-view" aria-labelledby="driving-title" hidden></section>
     </main>
   </div>
-  <nav class="mobile-nav" aria-label="Основная навигация"><button class="active" data-view="schedule"><span data-icon="calendar"></span>Расписание</button><button data-action="groups"><span data-icon="groups"></span>Группы</button><button data-view="saved"><span data-icon="bookmark"></span>Избранное</button><button data-action="sources"><span data-icon="layers"></span>Источники</button></nav>
+  <nav class="mobile-nav" aria-label="Основная навигация"><button class="active" data-view="schedule"><span data-icon="calendar"></span>Расписание</button><button data-action="groups"><span data-icon="groups"></span>Группы</button><button data-view="saved"><span data-icon="bookmark"></span>Избранное</button><button data-view="driving"><span data-icon="car"></span>Вождение</button><button data-action="sources"><span data-icon="layers"></span>Источники</button></nav>
   <dialog id="dialog" aria-labelledby="dialog-title"><div class="dialog-header"><span class="eyebrow">ТВОЁ ПРОСТРАНСТВО</span><button class="icon-button" data-action="close" aria-label="Закрыть"><span data-icon="close"></span></button></div><div id="dialog-content"></div></dialog>
   <div id="toast" role="status"></div>
   <noscript><div class="noscript">Для интерактивного расписания включите JavaScript.</div></noscript>
@@ -1800,6 +1863,359 @@ dialog{padding:24px;border:1px solid var(--line);color:var(--text);background:va
   return { iso, parse, addDays, dayIndex, monday, minutes, times, moscowNow, cycleFor, classify, getDay, conflicts, duration, plural, ics };
 });
 </script>
+  <script>(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory(require('./core.js'));
+  else root.ScheduleDriving = factory(root.ScheduleCore);
+})(typeof window === 'undefined' ? globalThis : window, function (C) {
+  'use strict';
+  const codePrefix = 'drive1.';
+  const places = ['unknown', 'city', 'course'];
+  const empty = () => ({
+    progress: { sessions: 0, approximate: false, city: 0, minutes: 0, goal: null },
+    lessons: []
+  });
+  const integer = (value, min, max) => Number.isInteger(value) && value >= min && value <= max;
+  const timePattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+  const duration = lesson => C.minutes(lesson.end) - C.minutes(lesson.start);
+  const ordered = lessons => [...lessons].sort((a, b) => (a.date + a.start).localeCompare(b.date + b.start));
+  function validProgress(progress) {
+    return progress && integer(progress.sessions, 0, 999) && typeof progress.approximate === 'boolean' &&
+      integer(progress.city, 0, progress.sessions) && (progress.minutes === null || integer(progress.minutes, 0, 60000)) &&
+      (progress.goal === null || integer(progress.goal, 1, 60000));
+  }
+  function validLesson(lesson) {
+    return lesson && typeof lesson.id === 'string' && /^[a-zA-Z0-9_-]{1,72}$/.test(lesson.id) &&
+      typeof lesson.date === 'string' && /^20\d\d-\d\d-\d\d$/.test(lesson.date) && C.iso(C.parse(lesson.date)) === lesson.date &&
+      typeof lesson.start === 'string' && typeof lesson.end === 'string' &&
+      timePattern.test(lesson.start) && timePattern.test(lesson.end) && lesson.start < lesson.end &&
+      (lesson.number === null || integer(lesson.number, 1, 9999)) &&
+      places.includes(lesson.place) && typeof lesson.done === 'boolean';
+  }
+  function valid(data) {
+    return data && validProgress(data.progress) && Array.isArray(data.lessons) && data.lessons.length <= 500 &&
+      data.lessons.every(validLesson) && new Set(data.lessons.map(l => l.id)).size === data.lessons.length &&
+      new Set(data.lessons.map(l => l.date + l.start)).size === data.lessons.length;
+  }
+  function summary(data) {
+    const completed = data.lessons.filter(l => l.done);
+    const loggedMinutes = completed.reduce((sum, l) => sum + duration(l), 0);
+    const minutes = data.progress.minutes === null ? null : data.progress.minutes + loggedMinutes;
+    return {
+      sessions: data.progress.sessions + completed.length,
+      approximate: data.progress.approximate,
+      city: data.progress.city + completed.filter(l => l.place === 'city').length,
+      loggedMinutes,
+      minutes,
+      goal: data.progress.goal,
+      remaining: minutes === null || data.progress.goal === null ? null : Math.max(data.progress.goal - minutes, 0)
+    };
+  }
+  function sections(data, now) {
+    const upcoming = [], pending = [], completed = [];
+    for (const lesson of ordered(data.lessons)) {
+      if (lesson.done) completed.unshift(lesson);
+      else if (lesson.date > now.key || (lesson.date === now.key && C.minutes(lesson.end) > now.minute)) upcoming.push(lesson);
+      else pending.unshift(lesson);
+    }
+    return { upcoming, pending, completed };
+  }
+  function encode(data) {
+    if (!valid(data)) throw new Error('Invalid driving data');
+    const p = data.progress;
+    const pack = [[p.sessions, p.approximate, p.city, p.minutes, p.goal], ...data.lessons.map(l =>
+      [l.id, l.date, l.start, l.end, l.number, l.place, l.done]
+    )];
+    return codePrefix + btoa(JSON.stringify(pack)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function decode(code) {
+    if (typeof code !== 'string') return null;
+    code = code.trim();
+    if (!/^drive1\.[A-Za-z0-9_-]+$/.test(code) || code.length > 65000) return null;
+    try {
+      const packed = JSON.parse(atob(code.slice(codePrefix.length).replace(/-/g, '+').replace(/_/g, '/')));
+      if (!Array.isArray(packed) || !Array.isArray(packed[0]) || packed[0].length !== 5 ||
+          !packed.slice(1).every(row => Array.isArray(row) && row.length === 7)) return null;
+      const [sessions, approximate, city, minutes, goal] = packed[0];
+      const result = { progress: { sessions, approximate, city, minutes, goal }, lessons: packed.slice(1).map(
+        ([id, date, start, end, number, place, done]) => ({ id, date, start, end, number, place, done })
+      ) };
+      return valid(result) ? result : null;
+    } catch (_) {
+      return null;
+    }
+  }
+  function merge(current, imported) {
+    if (!current) return imported;
+    const ids = new Set(current.lessons.map(l => l.id));
+    const starts = new Set(current.lessons.map(l => l.date + l.start));
+    const newLessons = imported.lessons.filter(l => !ids.has(l.id) && !starts.has(l.date + l.start));
+    return { progress: current.progress, lessons: [...current.lessons, ...newLessons] };
+  }
+  return { empty, valid, validLesson, validProgress, duration, summary, sections, encode, decode, merge };
+});
+</script>
+  <script>(function () {
+  'use strict';
+  const C = window.ScheduleCore;
+  const D = window.ScheduleDriving;
+  const storageKey = 'sched.driving.v1';
+  const places = { unknown: 'Место уточняется', city: 'Город', course: 'Площадка' };
+  const formatDate = key => {
+    const formatted = C.parse(key).toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  };
+  const formatDuration = minutes => {
+    const hours = Math.floor(minutes / 60);
+    const remainder = minutes % 60;
+    return [hours ? hours + ' ч' : '', remainder || !hours ? remainder + ' мин' : ''].filter(Boolean).join(' ');
+  };
+
+  function mount({ container, dialog, openDialog, closeDialog, toast, icon, escape }) {
+    let stored = null;
+    try {
+      const parsed = JSON.parse(localStorage.getItem(storageKey));
+      if (D.valid(parsed)) stored = parsed;
+    } catch (_) {}
+    const current = () => stored || D.empty();
+
+    function showError(message) {
+      const target = dialog.querySelector('.drive-error');
+      if (target) target.textContent = message;
+    }
+
+    function save(next, message) {
+      if (!D.valid(next)) {
+        showError('Проверьте значения полей и время занятия. На одно время можно сохранить одну запись.');
+        return;
+      }
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(next));
+      } catch (_) {
+        showError('Не удалось сохранить данные. Проверьте, разрешено ли хранение данных в браузере.');
+        return;
+      }
+      stored = next;
+      closeDialog();
+      render();
+      toast(message);
+    }
+
+    function lessonTitle(lesson) {
+      return lesson.number === null ? 'Занятие по вождению' : 'Запись №' + lesson.number;
+    }
+
+    function lessonCard(lesson, featured = false) {
+      const feature = featured ? ' drive-next' : '';
+      return `<button type="button" class="drive-lesson glass${feature}" data-driving-edit="${escape(lesson.id)}">
+        <span class="drive-lesson-icon">${icon(featured ? 'car' : 'calendar')}</span>
+        <span class="drive-lesson-content">
+          <strong>${formatDate(lesson.date)}</strong>
+          <span class="drive-time">${lesson.start}–${lesson.end} · ${formatDuration(D.duration(lesson))}</span>
+          <span class="drive-booking">${lessonTitle(lesson)} · ${places[lesson.place]}</span>
+        </span>
+        <span class="drive-more">${icon('chevronRight')}</span>
+      </button>`;
+    }
+
+    function historySection(title, lessons) {
+      if (!lessons.length) return '';
+      return `<section class="drive-history"><h2>${title}</h2><div class="drive-list">${lessons.map(l => lessonCard(l)).join('')}</div></section>`;
+    }
+
+    function clockProgress(p) {
+      if (p.minutes === null) {
+        const logged = p.loggedMinutes ? ` · по новым записям ${formatDuration(p.loggedMinutes)}` : '';
+        return `<p class="drive-meter-note">Пройденные часы пока не указаны${logged}.</p>`;
+      }
+      if (p.goal === null) return '';
+      const note = p.remaining ? 'Осталось ' + formatDuration(p.remaining) : 'Норма выполнена';
+      return `<progress class="drive-meter" max="${p.goal}" value="${Math.min(p.minutes, p.goal)}" aria-label="Прогресс часов"></progress><p class="drive-meter-note">${note}</p>`;
+    }
+
+    function render() {
+      const data = current();
+      const { upcoming, pending, completed } = D.sections(data, C.moscowNow());
+      const p = D.summary(data);
+      const hourTotal = p.minutes === null ? '—' : formatDuration(p.minutes);
+      const goal = p.goal === null ? 'Учтено часов' : 'Норма ' + formatDuration(p.goal);
+      const emptyText = stored ? 'Добавьте запись, когда инструктор подтвердит время.' : 'Добавьте первое занятие или загрузите готовые записи по коду.';
+      container.innerHTML = `
+        <div class="page-heading drive-heading">
+          <div><h1 id="driving-title">Вождение<span>.</span></h1><p>Занятия по записи · время по Москве</p></div>
+          <button type="button" class="primary-button drive-add" data-driving="add">${icon('plus')}<span>Добавить занятие</span></button>
+        </div>
+        <div class="drive-grid">
+          <div class="drive-sessions">
+            <section>
+              <h2>Ближайшее занятие</h2>
+              ${upcoming.length ? lessonCard(upcoming[0], true) : `<div class="drive-empty glass"><strong>Нет запланированных занятий</strong><p>${emptyText}</p></div>`}
+            </section>
+            ${historySection('Другие записи', upcoming.slice(1))}
+            ${historySection('Нужно отметить', pending)}
+            ${historySection('Пройденные занятия', completed)}
+          </div>
+          <div class="drive-side">
+            <section class="drive-progress glass">
+              <div class="drive-panel-header"><h2>Прогресс курса</h2><button type="button" class="icon-button" data-driving="progress" aria-label="Изменить прогресс">${icon('edit')}</button></div>
+              <dl class="drive-metrics">
+                <div><dt>Пройдено занятий</dt><dd>${p.approximate ? '≈' : ''}${p.sessions}</dd></div>
+                <div><dt>Выезды в город</dt><dd>${p.city}</dd></div>
+                <div><dt>${goal}</dt><dd>${hourTotal}</dd></div>
+              </dl>
+              ${clockProgress(p)}
+            </section>
+            <div class="drive-transfer">
+              <p>Записи сохраняются на этом устройстве.</p>
+              <button type="button" class="secondary-button" data-driving="import">Ввести код</button>
+              ${stored ? '<button type="button" class="secondary-button" data-driving="export">Код для переноса</button>' : ''}
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function editLesson(lesson) {
+      const l = lesson || {
+        id: 'lesson_' + Date.now().toString(36),
+        date: C.moscowNow().key, start: '', end: '', number: null, place: 'unknown', done: false
+      };
+      openDialog('driving-lesson', `
+        <h2 id="dialog-title">${lesson ? lessonTitle(l) : 'Добавить занятие'}</h2>
+        <form class="drive-form">
+          <label>Дата<input type="date" name="date" min="2000-01-01" max="2099-12-31" required value="${l.date}"></label>
+          <div class="drive-form-pair">
+            <label>Начало<input type="time" name="start" required value="${l.start}"></label>
+            <label>Окончание<input type="time" name="end" required value="${l.end}"></label>
+          </div>
+          <div class="drive-form-pair">
+            <label>Номер записи<input type="number" name="number" min="1" max="9999" value="${l.number ?? ''}"></label>
+            <label>Место<select name="place">${Object.entries(places).map(([key, label]) =>
+              `<option value="${key}"${l.place === key ? ' selected' : ''}>${label}</option>`).join('')}</select></label>
+          </div>
+          <label class="drive-check"><input type="checkbox" name="done"${l.done ? ' checked' : ''}>Занятие пройдено</label>
+          <p class="drive-error" role="alert"></p>
+          <button type="submit" class="primary-button">Сохранить занятие</button>
+          ${lesson ? '<button type="button" class="text-button drive-remove">Удалить запись</button>' : ''}
+        </form>`);
+      const form = dialog.querySelector('.drive-form');
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const fields = new FormData(form);
+        const updated = {
+          id: l.id, date: fields.get('date'), start: fields.get('start'), end: fields.get('end'),
+          number: fields.get('number') === '' ? null : Number(fields.get('number')),
+          place: fields.get('place'), done: fields.has('done')
+        };
+        if (!D.validLesson(updated)) { showError('Укажите дату и время. Окончание должно быть позже начала.'); return; }
+        const data = current();
+        save({ ...data, lessons: [...data.lessons.filter(item => item.id !== l.id), updated] }, 'Занятие сохранено');
+      });
+      const remove = form.querySelector('.drive-remove');
+      if (remove) remove.addEventListener('click', () => {
+        openDialog('driving-remove', `<h2 id="dialog-title">Удалить запись?</h2>
+          <p class="dialog-description">${lessonTitle(l)} · ${formatDate(l.date)} · ${l.start}–${l.end}</p>
+          <p class="drive-error" role="alert"></p>
+          <button type="button" class="primary-button drive-confirm-remove">Удалить</button>
+          <button type="button" class="secondary-button" data-action="close">Отмена</button>`);
+        dialog.querySelector('.drive-confirm-remove').addEventListener('click', () => {
+          const data = current();
+          save({ ...data, lessons: data.lessons.filter(item => item.id !== l.id) }, 'Запись удалена');
+        });
+      });
+    }
+
+    function editProgress() {
+      const p = current().progress;
+      openDialog('driving-progress', `<h2 id="dialog-title">Прогресс курса</h2>
+        <p class="dialog-description">Укажите прогресс за занятия до начала этого журнала. Записи, отмеченные пройденными здесь, прибавятся автоматически.</p>
+        <form class="drive-form">
+          <div class="drive-form-pair">
+            <label>Пройдено занятий<input type="number" name="sessions" min="0" max="999" required value="${p.sessions}"></label>
+            <label>Из них в городе<input type="number" name="city" min="0" max="999" required value="${p.city}"></label>
+          </div>
+          <label class="drive-check"><input type="checkbox" name="approximate"${p.approximate ? ' checked' : ''}>Количество занятий приблизительное</label>
+          <div class="drive-form-pair">
+            <label>Ранее пройдено, ч<input type="number" name="hours" min="0" max="1000" value="${p.minutes === null ? '' : Math.floor(p.minutes / 60)}"></label>
+            <label>Дополнительно, мин<input type="number" name="minutes" min="0" max="59" value="${p.minutes === null ? '' : p.minutes % 60}"></label>
+          </div>
+          <label>Норма курса, ч<input type="number" name="goal" min="0.1" max="1000" step="0.1" value="${p.goal === null ? '' : p.goal / 60}"></label>
+          <p class="drive-error" role="alert"></p>
+          <button type="submit" class="primary-button">Сохранить прогресс</button>
+        </form>`);
+      const form = dialog.querySelector('.drive-form');
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const fields = new FormData(form);
+        const sessions = Number(fields.get('sessions'));
+        const city = Number(fields.get('city'));
+        if (city > sessions) { showError('Выездов в город должно быть не больше, чем пройденных занятий.'); return; }
+        const hours = fields.get('hours');
+        const minutes = fields.get('minutes');
+        const goal = fields.get('goal');
+        const progress = {
+          sessions, city, approximate: fields.has('approximate'),
+          minutes: hours === '' && minutes === '' ? null : Number(hours) * 60 + Number(minutes),
+          goal: goal === '' ? null : Math.round(Number(goal) * 60)
+        };
+        save({ ...current(), progress }, 'Прогресс сохранён');
+      });
+    }
+
+    function showImport(code = '') {
+      const imported = D.decode(code);
+      const explanation = imported
+        ? `Записей в коде: ${imported.lessons.length}. ${stored ? 'Текущий прогресс и совпадающие записи сохранятся.' : 'Записи и прогресс сохранятся на этом устройстве.'}`
+        : 'Вставьте код с другого устройства или из сообщения с вашим расписанием.';
+      openDialog('driving-import', `<h2 id="dialog-title">Загрузить записи</h2>
+        <p class="dialog-description">${explanation}</p>
+        <form class="drive-form">
+          <label>Код расписания<textarea name="code" required maxlength="65000" rows="3" spellcheck="false" autocapitalize="off">${imported ? escape(code.trim()) : ''}</textarea></label>
+          <p class="drive-error" role="alert"></p>
+          <button type="submit" class="primary-button">Загрузить</button>
+        </form>`);
+      const form = dialog.querySelector('.drive-form');
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const incoming = D.decode(new FormData(form).get('code'));
+        if (!incoming) { showError('Код не распознан. Скопируйте его целиком.'); return; }
+        save(D.merge(stored, incoming), 'Записи загружены');
+      });
+    }
+
+    function showExport() {
+      const code = D.encode(current());
+      openDialog('driving-export', `<h2 id="dialog-title">Код для переноса</h2>
+        <p class="dialog-description">Скопируйте код и вставьте его в разделе «Вождение» на другом устройстве.</p>
+        <div class="drive-form"><label>Код расписания<textarea readonly rows="4" spellcheck="false">${escape(code)}</textarea></label>
+        <button type="button" class="primary-button drive-copy">Скопировать код</button></div>`);
+      dialog.querySelector('.drive-copy').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(code);
+          closeDialog();
+          toast('Код скопирован');
+        } catch (_) {
+          const field = dialog.querySelector('textarea');
+          field.focus();
+          field.select();
+        }
+      });
+    }
+
+    const actions = { add: () => editLesson(), progress: editProgress, import: () => showImport(), export: showExport };
+    container.addEventListener('click', event => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      if (button.dataset.drivingEdit) {
+        const lesson = current().lessons.find(l => l.id === button.dataset.drivingEdit);
+        if (lesson) editLesson(lesson);
+      } else if (actions[button.dataset.driving]) {
+        actions[button.dataset.driving]();
+      }
+    });
+    return { render, showImport };
+  }
+  window.ScheduleDrivingUI = { mount };
+})();
+</script>
   <script>(function () {
   'use strict';
   const C = window.ScheduleCore;
@@ -1832,7 +2248,10 @@ dialog{padding:24px;border:1px solid var(--line);color:var(--text);background:va
     chart:'<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>',
     close:'<path d="m6 6 12 12M6 18 18 6"/>', check:'<path d="m5 12 4 4L19 6"/>',
     book:'<path d="M4 4h6l2 2 2-2h6v15h-6l-2 2-2-2H4zM12 6v15"/>',
-    spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/>'
+    spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/>',
+    car:'<path d="m5 11 1.7-4.5A2 2 0 0 1 8.6 5h6.8a2 2 0 0 1 1.9 1.5L19 11m-14 0a2 2 0 0 0-2 2v4h18v-4a2 2 0 0 0-2-2H5zm0 6v2m14-2v2M7 14h1m8 0h1"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    edit:'<path d="m14 5 5 5M4 20l4.5-1 11-11a2.1 2.1 0 0 0-3-3l-11 11L4 20z"/>'
   };
   const icon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.book}</svg>`;
   const fillIcons = root => root.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = icon(el.dataset.icon); });
@@ -1841,13 +2260,15 @@ dialog{padding:24px;border:1px solid var(--line);color:var(--text);background:va
   try { const parsed = JSON.parse(read('sched.favorites', '[]')); favorites = Array.isArray(parsed) ? parsed.filter(f => f && typeof f.key === 'string' && typeof f.group === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(f.date)) : []; } catch (_) { favorites = []; }
   const storedGroup = read('sched.group', '');
   const query = new URLSearchParams(location.search);
+  const drivingLink = location.hash.startsWith('#driving=') ? location.hash.slice(9) : '';
   const requestedDate = query.get('date');
   const validDate = /^\d{4}-\d{2}-\d{2}$/.test(requestedDate || '') && C.iso(C.parse(requestedDate)) === requestedDate;
   const state = {
     group: data.groups[query.get('group')] ? query.get('group') : data.groups[storedGroup] ? storedGroup : 'ИБО-24',
     date: validDate ? requestedDate : C.moscowNow().key,
     filter: ['all','main','cbi'].includes(read('sched.filter','all')) ? read('sched.filter','all') : 'all',
-    view:'schedule', query:'', theme:read('sched.theme', 'dark') === 'light' ? 'light' : 'dark',
+    view:query.get('view') === 'driving' || drivingLink ? 'driving' : 'schedule',
+    query:'', theme:read('sched.theme', 'dark') === 'light' ? 'light' : 'dark',
     favorites, rendered:[], dialogKind:null, calendarMonth:null, dialogLesson:null
   };
   if (state.group === 'МК1') state.filter = 'all';
@@ -1952,6 +2373,20 @@ dialog{padding:24px;border:1px solid var(--line);color:var(--text);background:va
     $('notice').innerHTML = notices;
   }
   function render() {
+    const isDriving = state.view === 'driving';
+    $('academic-view').hidden = isDriving;
+    $('driving-view').hidden = !isDriving;
+    $('group-switch').hidden = isDriving;
+    document.querySelectorAll('[data-view]').forEach(b => {
+      b.classList.toggle('active', b.dataset.view === state.view);
+      if (b.dataset.view === state.view) b.setAttribute('aria-current', 'page');
+      else b.removeAttribute('aria-current');
+    });
+    if (isDriving) {
+      $('breadcrumb').textContent = 'Вождение';
+      driving.render();
+      return;
+    }
     $('group-name').textContent = state.group;
     $('group-avatar').textContent = state.group === 'МК1' ? 'МК' : 'ИБ';
     $('breadcrumb').textContent = state.view === 'saved' ? 'Избранное' : 'Расписание';
@@ -1960,7 +2395,6 @@ dialog{padding:24px;border:1px solid var(--line);color:var(--text);background:va
     $('current-date').textContent = shortDate(C.moscowNow().key);
     $('hero').hidden = state.view === 'saved';
     $('cbi-card').hidden = state.group !== 'ИБО-24';
-    document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === state.view));
     document.querySelectorAll('[data-filter]').forEach(b => { b.classList.toggle('active', b.dataset.filter === state.filter); b.setAttribute('aria-pressed', b.dataset.filter === state.filter); b.hidden = state.group === 'МК1' && b.dataset.filter === 'cbi'; });
     $('week-strip').hidden = state.view === 'saved';
     document.querySelector('.week-heading').hidden = state.view === 'saved';
@@ -2035,7 +2469,7 @@ dialog{padding:24px;border:1px solid var(--line);color:var(--text);background:va
   document.querySelector('.brand').addEventListener('click', e => { e.preventDefault(); state.view='schedule'; render(); });
   dialog.addEventListener('cancel', e => { e.preventDefault(); closeDialog(); });
   dialog.addEventListener('click', e => { if (e.target === dialog) { const r=dialog.getBoundingClientRect(); if (e.clientX<r.left || e.clientX>r.right || e.clientY<r.top || e.clientY>r.bottom) closeDialog(); } });
-  document.addEventListener('keydown', e => { if(e.key==='/' && !dialog.open && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) { e.preventDefault(); $('search').focus(); } });
+  document.addEventListener('keydown', e => { if(e.key==='/' && state.view !== 'driving' && !dialog.open && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) { e.preventDefault(); $('search').focus(); } });
   let touchStart = null;
   $('lessons').addEventListener('touchstart', e => { if(e.touches.length===1) touchStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; },{passive:true});
   $('lessons').addEventListener('touchend', e => { if(!touchStart || state.view!=='schedule' || dialog.open) return; const dx=e.changedTouches[0].clientX-touchStart.x,dy=e.changedTouches[0].clientY-touchStart.y; touchStart=null; if(Math.abs(dx)>75 && Math.abs(dx)>Math.abs(dy)*1.7) goTo(C.iso(C.addDays(C.parse(state.date),dx<0?1:-1))); },{passive:true});
@@ -2046,10 +2480,32 @@ dialog{padding:24px;border:1px solid var(--line);color:var(--text);background:va
   TG.on('safe_area_changed',d => safeArea('hardware',d));
   TG.on('theme_changed', d => { if(!read('sched.theme','') && d?.theme_params?.bg_color) { const hex=d.theme_params.bg_color.replace('#',''); state.theme=parseInt(hex.slice(0,2),16)>150?'light':'dark'; applyTheme(); } });
   if(TG.available()) { TG.post('web_app_ready'); TG.post('web_app_expand'); if(TG.atLeast('8.0')) { TG.post('web_app_request_safe_area'); TG.post('web_app_request_content_safe_area'); } }
+  const driving = window.ScheduleDrivingUI.mount({
+    container: $('driving-view'), dialog, openDialog, closeDialog, toast, icon, escape: esc
+  });
   applyTheme(); render();
-  if(!storedGroup && !query.get('group')) showGroups();
+  if (drivingLink) {
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (_) {}
+    driving.showImport(drivingLink);
+  } else if (state.view === 'schedule' && !storedGroup && !query.get('group')) showGroups();
   let lastToday = C.moscowNow().key;
-  function tick() { const now=C.moscowNow(); if(now.key!==lastToday){ if(state.date===lastToday) state.date=now.key;lastToday=now.key; if(!dialog.open && !document.hidden) { render(); return; } } if(!dialog.open && !document.hidden) { renderHero(); renderLessons(); $('current-date').textContent=shortDate(now.key); } }
+  function tick() {
+    const now = C.moscowNow();
+    const changedDay = now.key !== lastToday;
+    if (changedDay) {
+      if (state.date === lastToday) state.date = now.key;
+      lastToday = now.key;
+    }
+    if (dialog.open || document.hidden) return;
+    if (state.view === 'driving') {
+      if (!$('driving-view').contains(document.activeElement)) driving.render();
+      return;
+    }
+    if (changedDay) { render(); return; }
+    renderHero();
+    renderLessons();
+    $('current-date').textContent = shortDate(now.key);
+  }
   setInterval(tick,30000);
   document.addEventListener('visibilitychange', () => { document.documentElement.classList.toggle('paused',document.hidden); if(!document.hidden) tick(); });
 })();
