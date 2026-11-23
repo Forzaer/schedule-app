@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a1019">
+  <meta name="description" content="Расписание МК1 и ИБО-24: пары, занятия ЦБИ, календарь и избранное в одном Telegram Mini App.">
+  <title>Расписание · МК1 и ИБО-24</title>
+  <style>/* STYLES */</style>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div><div class="ambient ambient-two" aria-hidden="true"></div>
+  <aside class="sidebar">
+    <a class="brand" href="#" aria-label="Расписание, главная"><span class="brand-mark">р<span>.</span></span><span>расписание<span class="brand-caption">ТВОЙ УЧЕБНЫЙ РИТМ</span></span></a>
+    <div class="sidebar-label">ПРОСТРАНСТВО</div>
+    <nav class="nav" aria-label="Навигация">
+      <button data-view="schedule" class="active"><span data-icon="calendar"></span><span>Расписание</span></button>
+      <button data-action="groups"><span data-icon="groups"></span><span>Мои группы</span><span class="nav-count">2</span></button>
+      <button data-view="saved"><span data-icon="bookmark"></span><span>Избранное</span></button>
+      <button data-action="sources"><span data-icon="layers"></span><span>Источники</span></button>
+    </nav>
+    <div class="sidebar-note"><span class="tiny-label">МЕНЬШЕ ХАОСА</span><p>Больше времени<br>на важное.</p><div class="note-line"></div><span>Все пары в одном месте</span></div>
+    <div class="sidebar-footer"><span class="version">v3.0</span><span>Сделано для твоего дня</span></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <span class="breadcrumb">Моё пространство <span>/</span> <b id="breadcrumb">Расписание</b></span>
+      <span class="mobile-brand">р<span>.</span></span>
+      <div class="top-actions"><button id="theme" class="icon-button" aria-label="Переключить тему"></button><button id="group-switch" class="group-switch" data-action="groups"><span class="group-avatar" id="group-avatar">ИБ</span><span id="group-name">ИБО-24</span><span data-icon="chevronDown"></span></button></div>
+    </header>
+    <main id="main">
+      <div class="page-heading"><div><div class="eyebrow" id="eyebrow">ТВОЙ ДЕНЬ ПОД КОНТРОЛЕМ</div><h1 id="page-title">Всё по расписанию<span>.</span></h1><p id="page-subtitle">Выбирай день. Остальное уже здесь.</p></div><div class="date-tag"><span data-icon="clock"></span><span id="current-date"></span><span class="timezone">МСК</span></div></div>
+      <section id="hero" class="hero glass" aria-label="Ближайшее занятие"></section>
+      <div class="content-grid">
+        <section class="schedule-column" aria-label="Расписание занятий">
+          <div class="schedule-toolbar"><div class="segmented" id="filters" aria-label="Фильтр расписания"><button data-filter="all" class="active">Все пары</button><button data-filter="main">Основное</button><button data-filter="cbi">ЦБИ<span class="cbi-dot"></span></button></div><button class="icon-button" data-action="export" aria-label="Скачать неделю в календарь" title="Скачать неделю в календарь"><span data-icon="download"></span></button></div>
+          <div class="week-heading"><button class="month-button" data-action="calendar"><span id="month-label"></span><span data-icon="chevronDown"></span></button><div class="week-actions"><button class="icon-button small" data-action="prev-week" aria-label="Предыдущая неделя"><span data-icon="chevronLeft"></span></button><button class="text-button" data-action="today">Сегодня</button><button class="icon-button small" data-action="next-week" aria-label="Следующая неделя"><span data-icon="chevronRight"></span></button></div></div>
+          <div class="week-strip" id="week-strip" aria-label="Дни недели"></div>
+          <div class="day-heading"><h2 id="day-title"></h2><span id="day-count"></span></div>
+          <label class="search-box"><span data-icon="search"></span><input id="search" type="search" placeholder="Найти предмет или аудиторию" aria-label="Найти предмет или аудиторию"><kbd>/</kbd></label>
+          <div id="notice"></div><div id="lessons" aria-live="polite"></div>
+        </section>
+        <aside class="insights" aria-label="Сводка недели">
+          <section class="glass week-card"><div class="panel-heading"><h2>Эта неделя</h2><span data-icon="chart"></span></div><p id="week-range" class="muted"></p><div class="week-total"><strong id="week-total">0</strong><span>пар в<br>расписании</span></div><div id="week-chart" class="week-chart"></div><div class="week-bottom"><span data-icon="clock"></span><span id="week-duration"></span></div></section>
+          <section class="glass cbi-card" id="cbi-card"><div class="cbi-label"><span data-icon="shield"></span>ДОПОЛНИТЕЛЬНОЕ ОБУЧЕНИЕ</div><h2>Практика в ЦБИ</h2><p>Темы, время и аудитории.<br>Всё рядом с основными парами.</p><button data-action="next-cbi" class="cbi-button">Ближайшее занятие<span data-icon="calendar"></span></button></section>
+          <section class="source-summary"><span data-icon="layers"></span><div><b>Расписание обновлено</b><span>23 ноября 2026</span><button data-action="sources">Посмотреть источники</button></div></section>
+        </aside>
+      </div>
+      <footer class="page-footer"><span>Учись в своём ритме.</span><span>МК1 · ИБО-24 <span class="footer-dot">/</span> Время по Москве</span></footer>
+    </main>
+  </div>
+  <nav class="mobile-nav" aria-label="Основная навигация"><button class="active" data-view="schedule"><span data-icon="calendar"></span>Расписание</button><button data-action="groups"><span data-icon="groups"></span>Группы</button><button data-view="saved"><span data-icon="bookmark"></span>Избранное</button><button data-action="sources"><span data-icon="layers"></span>Источники</button></nav>
+  <dialog id="dialog" aria-labelledby="dialog-title"><div class="dialog-header"><span class="eyebrow">ТВОЁ ПРОСТРАНСТВО</span><button class="icon-button" data-action="close" aria-label="Закрыть"><span data-icon="close"></span></button></div><div id="dialog-content"></div></dialog>
+  <div id="toast" role="status"></div>
+  <noscript><div class="noscript">Для интерактивного расписания включите JavaScript.</div></noscript>
+  <script id="schedule-data" type="application/json">/* DATA */</script>
+  <script>/* TELEGRAM */</script>
+  <script>/* CORE */</script>
+  <script>/* APP */</script>
+</body>
+</html>

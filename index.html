@@ -1,134 +1,1014 @@
-<!DOCTYPE html>
-<html lang="ru" class="boot">
+<!doctype html>
+<html lang="ru" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#07090f">
-<meta name="format-detection" content="telephone=no">
-<title>Расписание</title>
-<!--
-  Расписание — Telegram Mini App в одном файле, без внешних зависимостей.
-  Подключение к Telegram и правила редактирования данных: README.md в репозитории.
-  Данные ниже: "weekly" — повторяющаяся неделя (monday…sunday),
-  "cycle" — список [{"start": "2026-10-17", "weeks": [неделя 1, неделя 2…]}]: с даты start вместо weekly
-  действует это расписание, недели идут по очереди; более поздний start сменяет более ранний,
-  "dates" — пары на конкретную дату ("2026-10-14"), показываются как есть,
-  "extra" — занятия, которые добавляются к дню из cycle/weekly (ЦБИ). Дата важнее цикла, цикл важнее weekly. Поля пары: num, time, subject, type, teacher, room, topic, link.
--->
-<script type="application/json" id="schedule-data">
-{
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a1019">
+  <meta name="description" content="Расписание МК1 и ИБО-24: пары, занятия ЦБИ, календарь и избранное в одном Telegram Mini App.">
+  <title>Расписание · МК1 и ИБО-24</title>
+  <style>*{box-sizing:border-box} :root{color-scheme:dark;--bg:#0a1019;--sidebar:#0c131e;--surface:rgba(21,31,45,.65);--surface-solid:#151f2d;--hover:#1c2a3b;--text:#f0f4fa;--muted:#92a1b4;--line:rgba(167,192,221,.11);--mint:#a4f5d4;--mint-ink:#0e3026;--mint-soft:rgba(164,245,212,.09);--violet:#b1a2ff;--shadow:0 24px 80px #0005;--safe-top:0px;--safe-bottom:0px;font-family:'Segoe UI',Arial,sans-serif;font-size:16px} :root[data-theme=light]{color-scheme:light;--bg:#eef3f8;--sidebar:#f7f9fc;--surface:rgba(255,255,255,.75);--surface-solid:#fff;--hover:#e4ecf5;--text:#16293a;--muted:#5c7084;--line:rgba(43,77,111,.14);--mint:#116f54;--mint-ink:#fff;--mint-soft:rgba(20,126,91,.08);--violet:#6750ba;--shadow:0 24px 80px #293e551a}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.5;-webkit-tap-highlight-color:transparent}button,a,input{font:inherit}button{cursor:pointer;color:inherit;border:0;background:none}button,a,input{-webkit-tap-highlight-color:transparent}button:disabled{cursor:default;opacity:.4}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--mint);outline-offset:4px}button{touch-action:manipulation}a{color:inherit;text-decoration:none}h1,h2,h3,p{margin:0}svg{width:20px;height:20px;display:block;flex-shrink:0}button svg{pointer-events:none}button:hover{filter:brightness(1.08)}[hidden]{display:none!important}.muted{color:var(--muted);font-size:.875rem}.glass{background:var(--surface);border:1px solid var(--line);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}.ambient{position:fixed;border-radius:50%;pointer-events:none;z-index:-1;filter:blur(100px);opacity:.08}.ambient-one{width:600px;height:600px;background:#3caa9c;right:-150px;top:-250px}.ambient-two{width:450px;height:450px;background:#615ca9;left:250px;bottom:-280px}
+.sidebar{width:236px;position:fixed;inset:0 auto 0 0;display:flex;flex-direction:column;padding:40px 22px 24px;background:var(--sidebar);border-right:1px solid var(--line);z-index:5}.brand{display:flex;align-items:center;gap:12px;font-size:1.18rem;font-weight:650;letter-spacing:-.6px}.brand-mark{font-size:2.8rem;font-weight:700;line-height:1;letter-spacing:-5px;transform:translateY(-5px);padding-right:6px}.brand-mark>span,.mobile-brand>span{color:var(--mint)}.brand-caption{display:block;color:var(--muted);font-size:.56rem;letter-spacing:1.7px;font-weight:500;margin-top:4px}.sidebar-label{margin:55px 12px 18px;font-size:.68rem;letter-spacing:1.7px;color:var(--muted)}.nav{display:flex;flex-direction:column;gap:8px}.nav>button{display:flex;gap:13px;align-items:center;padding:13px 14px;border-radius:10px;font-size:.9rem;color:var(--muted);text-align:left;min-height:48px}.nav>button.active{background:var(--mint-soft);color:var(--mint)}.nav>button:hover{background:var(--hover)}.nav-count{margin-left:auto;background:var(--hover);border-radius:5px;font-size:.75rem;padding:0 6px}.sidebar-note{margin:auto 12px 28px;padding-top:40px}.tiny-label{font-size:.65rem;letter-spacing:1.7px;color:var(--mint)}.sidebar-note p{font-size:1.35rem;line-height:1.45;font-weight:400;letter-spacing:-.5px;margin-top:12px}.note-line{height:1px;width:36px;background:var(--mint);margin:20px 0;opacity:.5}.sidebar-note>span:last-child{color:var(--muted);font-size:.75rem}.sidebar-footer{border-top:1px solid var(--line);padding-top:22px;display:flex;gap:10px;font-size:.65rem;color:var(--muted);align-items:center}.version{border:1px solid var(--line);padding:2px 6px;border-radius:4px}
+.workspace{margin-left:236px}.topbar{height:92px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 48px;padding-top:var(--safe-top)}.breadcrumb{font-size:.82rem;color:var(--muted)}.breadcrumb>span{margin:0 14px;color:#586b80}.breadcrumb b{font-weight:400;color:var(--text)}.top-actions{display:flex;align-items:center;gap:20px}.icon-button{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;min-width:42px;border:1px solid var(--line);border-radius:11px;color:var(--muted)}.icon-button:hover{background:var(--hover);color:var(--text)}.icon-button.small{width:32px;min-width:32px;height:36px;border:0}.icon-button.small svg{width:16px}.group-switch{display:flex;align-items:center;gap:10px;font-size:.875rem;font-weight:550;min-height:44px}.group-switch svg{width:14px;color:var(--muted);margin-left:5px}.group-avatar{display:grid;place-items:center;background:var(--mint-soft);border:1px solid var(--line);color:var(--mint);border-radius:10px;width:34px;height:34px;font-size:.7rem;letter-spacing:.5px}.mobile-brand{display:none}
+main{max-width:1436px;margin:0 auto;padding:36px 48px 20px}.page-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:27px;gap:20px}.eyebrow{font-size:.65rem;font-weight:600;letter-spacing:1.8px;color:var(--mint);margin-bottom:10px}h1{font-size:2rem;line-height:1.25;letter-spacing:-1.1px;font-weight:600}h1>span{color:var(--mint)}.page-heading p{font-size:.9rem;color:var(--muted);margin-top:9px}.date-tag{font-size:.8rem;display:flex;align-items:center;gap:9px;color:var(--muted);white-space:nowrap;padding-top:18px}.date-tag svg{width:16px}.timezone{font-size:.6rem;letter-spacing:.5px;border:1px solid var(--line);padding:2px 5px;border-radius:4px}
+.hero{min-height:226px;border-radius:18px;position:relative;overflow:hidden;padding:28px 34px;display:flex;align-items:center;isolation:isolate;margin-bottom:32px;background:linear-gradient(110deg,var(--surface-solid),rgba(26,53,54,.38));border-color:rgba(164,245,212,.18)}.hero:before{content:'';position:absolute;width:450px;height:450px;right:-100px;top:-150px;background:radial-gradient(ellipse,#6adebc25,transparent 65%);z-index:-1}.hero-content{max-width:66%;z-index:2}.hero-status{font-size:.65rem;letter-spacing:1.5px;color:var(--mint);display:flex;align-items:center;gap:8px;font-weight:550}.live-dot{width:6px;height:6px;background:var(--mint);border-radius:50%;box-shadow:0 0 10px var(--mint)}.hero h2{font-size:1.55rem;line-height:1.3;font-weight:500;letter-spacing:-.5px;margin:13px 0}.hero-meta{color:var(--muted);font-size:.82rem;display:flex;align-items:center;flex-wrap:wrap;gap:15px}.hero-meta>span{display:flex;align-items:center;gap:7px}.hero-meta svg{width:15px}.hero-bottom{font-size:.72rem;color:var(--muted);margin-top:18px}.hero-bottom b{color:var(--mint);font-weight:500}.hero-open{position:absolute;inset:0;z-index:3;border-radius:18px}.hero-orbit{position:absolute;right:7%;width:210px;height:210px;transform:rotate(-28deg);pointer-events:none}.orbit-ring{position:absolute;inset:15px;border-radius:50%;border:1px solid #9cf6dc44;box-shadow:inset 0 0 25px #9cf6dc0a,0 0 35px #7bf4cf0a;transform:rotateX(55deg)}.orbit-ring:nth-child(2){inset:0;transform:rotateX(55deg) rotateY(50deg);border-color:#9b99ff44}.orbit-ring:nth-child(3){inset:30px;transform:rotateX(-30deg) rotateY(50deg)}.orbit-core{position:absolute;inset:57px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#d9ffe7,#69c8b2 35%,#226574 68%,#1b2f51);box-shadow:inset -9px -8px 20px #001d4780,0 0 70px #6ff3c122;animation:float 7s ease-in-out infinite}.orbit-satellite{position:absolute;left:24px;top:35px;width:13px;height:13px;border-radius:50%;background:#b0b4ff;box-shadow:0 0 15px #b0b4ff55}.hero-cta{color:var(--mint);border:1px solid #a4f5d433;border-radius:7px;padding:7px 12px;font-size:.75rem;margin-top:14px}
+.content-grid{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:32px}.schedule-column{min-width:0}.schedule-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:23px}.segmented{display:flex;gap:4px;background:var(--sidebar);border:1px solid var(--line);padding:4px;border-radius:11px}.segmented>button{border-radius:7px;font-size:.8rem;min-height:35px;padding:6px 16px;color:var(--muted);display:flex;align-items:center;gap:8px}.segmented>button.active{color:var(--text);background:var(--hover);box-shadow:0 2px 5px #0002}.cbi-dot{width:5px;height:5px;border-radius:50%;background:var(--violet)}.week-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.month-button{font-size:1rem;font-weight:550;display:flex;align-items:center;gap:10px}.month-button>span:first-child:first-letter{text-transform:uppercase}.month-button svg{width:14px;color:var(--muted)}.week-actions{display:flex;align-items:center;gap:2px}.text-button{font-size:.75rem;padding:7px 9px;color:var(--muted)}.week-strip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin-bottom:27px}.day-button{min-height:81px;border-radius:12px;border:1px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted)}.day-button:hover{background:var(--hover)}.day-button .day-name{font-size:.7rem}.day-button .day-number{font-size:1.2rem;font-weight:500;color:var(--text);line-height:1.2}.day-button.selected{background:var(--mint);color:var(--mint-ink);box-shadow:0 5px 22px #a4f5d412}.day-button.selected .day-number{color:var(--mint-ink)}.day-button.is-today:not(.selected){border-color:#a4f5d444}.day-pips{display:flex;align-items:center;justify-content:center;gap:3px;height:8px}.day-pips>i{width:3px;height:3px;border-radius:50%;background:var(--muted)}.day-button.selected .day-pips>i{background:var(--mint-ink);opacity:.6}.day-pips .cbi{background:var(--violet)}.day-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}.day-heading h2{font-size:1rem;font-weight:500}.day-heading>span{font-size:.73rem;color:var(--muted)}.search-box{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin-bottom:18px;color:var(--muted)}.search-box>svg{width:16px}.search-box input{color:var(--text);background:transparent;border:0;min-width:0;width:100%;outline:none;font-size:.8rem}.search-box input::placeholder{color:var(--muted)}kbd{font-family:inherit;font-size:.7rem;border:1px solid var(--line);border-radius:4px;padding:0 5px}.lesson-layout{display:grid;grid-template-columns:66px minmax(0,1fr);gap:14px;margin-bottom:12px;position:relative}.lesson-time{display:flex;flex-direction:column;align-items:flex-end;padding-top:17px;font-variant-numeric:tabular-nums;position:relative}.lesson-time strong{font-size:.95rem;font-weight:550;line-height:1.2}.lesson-time span{font-size:.7rem;color:var(--muted);margin-top:4px}.lesson-time:after{content:'';width:1px;position:absolute;top:65px;bottom:-15px;right:3px;background:var(--line)}.lesson-layout:last-child .lesson-time:after{display:none}.lesson-card{border:1px solid var(--line);border-radius:12px;background:var(--surface);position:relative;overflow:hidden;display:flex;align-items:stretch;transition:border-color .2s,transform .2s}.lesson-card:hover{border-color:#9bc0d744;transform:translateY(-2px)}.lesson-card:before{content:'';position:absolute;left:0;top:20px;bottom:20px;width:2px;border-radius:2px;background:var(--lesson-color)}.lesson-main{text-align:left;flex:1;min-width:0;padding:17px 15px 17px 21px}.lesson-top{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.65rem;flex-wrap:wrap}.type-tag{color:var(--lesson-color);font-size:.65rem;border-radius:4px;padding:2px 6px;background:color-mix(in srgb,var(--lesson-color) 9%,transparent);text-transform:capitalize}.lesson-main h3{font-size:.95rem;font-weight:500;line-height:1.4;letter-spacing:-.1px;margin:8px 0 11px;overflow-wrap:anywhere}.lesson-meta{display:flex;flex-wrap:wrap;column-gap:15px;row-gap:5px;color:var(--muted);font-size:.72rem}.lesson-meta>span{display:flex;align-items:center;gap:5px}.lesson-meta svg{width:13px;height:13px}.lesson-save{align-self:flex-start;width:38px;min-width:38px;height:44px;margin:7px 5px 0 0;color:var(--muted);display:grid;place-items:center}.lesson-save svg{width:16px}.lesson-save.saved{color:var(--mint)}.lesson-save.saved svg{fill:var(--mint-soft)}.lesson-card.live{border-color:#a4f5d444;background:linear-gradient(100deg,var(--mint-soft),var(--surface))}.live-label{color:var(--mint);display:flex;align-items:center;gap:5px;font-size:.6rem}.live-label .live-dot{width:4px;height:4px}.progress-track{height:2px;background:var(--line);margin-top:14px;overflow:hidden}.progress-track>i{height:100%;display:block;background:var(--mint)}.gap-label{display:flex;align-items:center;gap:8px;font-size:.68rem;color:var(--muted);margin:7px 0 16px 80px}.gap-label:before,.gap-label:after{content:'';height:1px;flex:1;background:var(--line)}.empty-state{border:1px dashed var(--line);border-radius:13px;padding:38px 24px;text-align:center}.empty-state>svg{width:32px;height:32px;color:var(--mint);margin:0 auto 14px}.empty-state h3{font-size:1.1rem;font-weight:500}.empty-state p{font-size:.82rem;color:var(--muted);margin:10px auto 0;max-width:360px}.notice{font-size:.75rem;color:var(--muted);border:1px solid var(--line);border-radius:9px;padding:11px 14px;margin-bottom:16px}.notice b{color:var(--text);font-weight:500}.conflict{border-color:#eab66c55;color:#eab66c}.source-tag{color:var(--violet)}
+.insights{padding-top:0}.week-card{padding:22px;border-radius:14px;margin-bottom:18px}.panel-heading{display:flex;justify-content:space-between;align-items:center}.panel-heading h2{font-size:.9rem;font-weight:500}.panel-heading>span{color:var(--muted)}.panel-heading svg{width:17px}.week-card>p{font-size:.7rem;margin-top:5px}.week-total{display:flex;align-items:center;gap:12px;margin:21px 0 25px}.week-total strong{font-size:2.8rem;line-height:1;font-weight:400;letter-spacing:-2px}.week-total>span{font-size:.7rem;color:var(--muted);line-height:1.4}.week-chart{height:100px;display:flex;align-items:flex-end;justify-content:space-between;gap:9px}.chart-column{height:100%;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:9px}.chart-bar{background:var(--mint-soft);width:100%;max-width:20px;min-height:3px;border:1px solid #a4f5d418;border-radius:4px 4px 2px 2px}.chart-column.selected .chart-bar{background:var(--mint);border:0}.chart-column span{font-size:.6rem;color:var(--muted)}.chart-column.selected span{color:var(--mint)}.week-bottom{font-size:.72rem;color:var(--muted);border-top:1px solid var(--line);margin-top:20px;padding-top:15px;display:flex;gap:7px;align-items:center}.week-bottom svg{width:14px}.cbi-card{padding:22px;border-radius:14px;background:linear-gradient(140deg,rgba(104,89,164,.14),var(--surface));border-color:#b1a2ff22}.cbi-label{font-size:.52rem;letter-spacing:1px;color:var(--violet);display:flex;align-items:center;gap:7px}.cbi-label svg{width:17px}.cbi-card h2{font-size:1.25rem;font-weight:500;letter-spacing:-.5px;margin:15px 0 10px}.cbi-card p{color:var(--muted);font-size:.75rem;line-height:1.8}.cbi-button{display:flex;align-items:center;justify-content:space-between;width:100%;border-top:1px solid var(--line);margin-top:20px;padding:15px 0 0;text-align:left;font-size:.72rem;color:var(--violet)}.cbi-button svg{width:15px}.source-summary{display:flex;align-items:flex-start;gap:10px;margin:24px 6px;color:var(--muted)}.source-summary>span>svg{width:16px;margin-top:3px}.source-summary b{font-weight:400;display:block;font-size:.72rem}.source-summary div>span{display:block;font-size:.65rem;margin-top:4px}.source-summary button{font-size:.65rem;color:var(--mint);padding:9px 0}.page-footer{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:.65rem;padding:30px 0 6px;opacity:.7;gap:12px}.footer-dot{margin:0 8px}.mobile-nav{display:none}
+dialog{padding:24px;border:1px solid var(--line);color:var(--text);background:var(--surface-solid);border-radius:20px;max-width:520px;width:calc(100% - 32px);box-shadow:var(--shadow);max-height:85dvh;overflow:auto}dialog::backdrop{background:#030b16aa;backdrop-filter:blur(8px)}.dialog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.dialog-header .eyebrow{margin:0}.dialog-header .icon-button{border:0}.dialog-header~div h2{font-size:1.6rem;line-height:1.3;letter-spacing:-.5px;font-weight:500;margin-bottom:12px}.dialog-description{font-size:.85rem;color:var(--muted);margin-bottom:24px}.group-option{display:flex;align-items:center;gap:17px;width:100%;text-align:left;border:1px solid var(--line);border-radius:12px;padding:22px 18px;margin-top:13px}.group-option.current{border-color:#a4f5d466;background:var(--mint-soft)}.group-option>.group-avatar{width:52px;height:52px;font-size:1rem;border-radius:14px}.group-option b{display:block;font-weight:500;font-size:1.1rem}.group-option span span{display:block;color:var(--muted);font-size:.75rem;margin-top:5px}.group-option>svg{margin-left:auto;color:var(--mint)}.dialog-footnote{font-size:.7rem;color:var(--muted);margin:22px 0 2px}.detail-tags{display:flex;gap:8px;margin:10px 0 20px}.detail-tags>span{border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:.75rem;color:var(--mint)}.detail-row{display:flex;gap:13px;padding:14px 0;border-top:1px solid var(--line);font-size:.9rem}.detail-row>svg{color:var(--muted);width:18px;margin-top:2px}.detail-row small{display:block;color:var(--muted);font-size:.7rem;margin-bottom:4px}.detail-row p{overflow-wrap:anywhere}.primary-button{background:var(--mint);color:var(--mint-ink);padding:12px 20px;border-radius:10px;font-size:.85rem;display:flex;align-items:center;gap:9px;justify-content:center;width:100%;margin-top:20px}.secondary-button{border:1px solid var(--line);padding:9px 14px;border-radius:8px;color:var(--mint);font-size:.8rem;margin-top:16px}.source-item{padding:18px 0;border-top:1px solid var(--line)}.source-item h3{font-weight:500;font-size:.9rem}.source-item p{font-size:.8rem;color:var(--muted);margin-top:8px}.calendar-header{display:flex;align-items:center;justify-content:space-between;margin:18px 0}.calendar-header b{text-transform:capitalize;font-weight:500}.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.calendar-grid>.cal-label{text-align:center;font-size:.7rem;color:var(--muted);padding:8px 0}.calendar-grid>button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:45px;border-radius:8px;font-size:.85rem}.calendar-grid>button:hover{background:var(--hover)}.calendar-grid>button.selected{background:var(--mint);color:var(--mint-ink)}.cal-dot{width:3px;height:3px;border-radius:50%;background:var(--mint)}.selected .cal-dot{background:var(--mint-ink)}.cal-missing{opacity:.5}.calendar-legend{font-size:.7rem;color:var(--muted);margin-top:18px}.saved-date{font-size:.75rem;color:var(--mint);margin:22px 0 12px}.saved-date:first-child{margin-top:0}#toast{position:fixed;bottom:32px;left:50%;transform:translate(-50%,20px);background:var(--surface-solid);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:10px;padding:12px 20px;font-size:.8rem;z-index:30;opacity:0;pointer-events:none;transition:.2s;max-width:calc(100% - 32px);text-align:center}#toast.visible{opacity:1;transform:translate(-50%,0)}.noscript{position:fixed;inset:10%;background:var(--surface-solid);padding:40px;z-index:50}.empty-state .secondary-button{display:inline-block}body.modal-open{overflow:hidden}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}@media(min-width:1500px){main{padding-top:46px}.hero{min-height:240px}.hero h2{font-size:1.8rem}.hero-orbit{right:9%;transform:rotate(-28deg) scale(1.12)}}@media(max-width:1250px){.sidebar{width:205px;padding-left:15px;padding-right:15px}.workspace{margin-left:205px}.topbar{padding-left:30px;padding-right:30px}main{padding-left:30px;padding-right:30px}.content-grid{gap:24px;grid-template-columns:minmax(0,1fr) 240px}.brand{font-size:1rem;gap:9px}.sidebar-footer{font-size:.56rem;gap:6px}.hero{padding-left:27px}.hero-orbit{right:2%}.hero-content{max-width:70%}.hero h2{font-size:1.45rem}.date-tag{font-size:.7rem}.segmented>button{padding:6px 12px}.cbi-card,.week-card{padding:18px}}
+@media(max-width:1050px){.sidebar{width:82px;padding:28px 14px}.brand>span:last-child,.sidebar-label,.nav>button>span:nth-child(n+2),.sidebar-note,.sidebar-footer{display:none}.brand{justify-content:center;margin-bottom:44px}.nav>button{justify-content:center;padding:14px}.workspace{margin-left:82px}.content-grid{grid-template-columns:minmax(0,1fr) 235px;gap:24px}main{padding:30px 26px}.topbar{padding:0 26px;height:80px}h1{font-size:1.8rem}.date-tag{display:none}.hero-orbit{right:0}.hero h2{font-size:1.4rem}.hero-content{max-width:70%}}
+@media(max-width:780px){.insights{display:none}.content-grid{display:block}main{max-width:740px}.hero{min-height:220px}.hero-orbit{right:4%}.hero-content{max-width:68%}.sidebar{width:74px;padding:27px 10px}.workspace{margin-left:74px}}
+@media(max-width:600px){.sidebar{display:none}.workspace{margin-left:0}.topbar{height:calc(76px + var(--safe-top));padding-left:20px;padding-right:20px}.breadcrumb{display:none}.mobile-brand{display:block;font-size:2.25rem;font-weight:650;letter-spacing:-4px;line-height:1;transform:translateY(-4px)}.top-actions{gap:16px}.top-actions>.icon-button{border:0;width:36px;min-width:36px}.group-switch{font-size:.85rem;gap:8px}.group-avatar{width:30px;height:30px;border-radius:8px}main{padding:27px 20px calc(95px + var(--safe-bottom))}.page-heading{margin-bottom:23px}.eyebrow{font-size:.56rem;letter-spacing:1.6px;margin-bottom:9px}h1{font-size:1.7rem;letter-spacing:-.8px}.page-heading p{font-size:.8rem;margin-top:8px}.hero{min-height:224px;border-radius:15px;padding:23px;margin-bottom:26px}.hero-content{max-width:78%}.hero h2{font-size:1.27rem;margin-top:12px}.hero-status{font-size:.57rem;letter-spacing:1px}.hero-meta{font-size:.72rem;gap:8px 12px}.hero-bottom{font-size:.65rem;margin-top:18px}.hero-orbit{right:-79px;top:15px;opacity:.6;transform:rotate(-28deg) scale(.85)}.hero-open{border-radius:15px}.hero-orbit:after{content:'';position:absolute;inset:-40px;background:linear-gradient(90deg,var(--surface-solid),transparent 65%)}.hero-cta{font-size:.7rem}.schedule-toolbar{margin-bottom:20px}.segmented{gap:2px}.segmented>button{font-size:.75rem;padding:6px 13px;min-height:32px}.schedule-toolbar>.icon-button{width:40px;height:40px;min-width:40px}.week-strip{gap:4px;margin-bottom:24px}.day-button{min-height:77px;border-radius:10px}.day-button .day-name{font-size:.65rem}.day-button .day-number{font-size:1.1rem}.month-button{font-size:.92rem;gap:7px}.month-button svg{width:12px}.week-actions{gap:0}.text-button{font-size:.7rem;padding:7px 5px}.icon-button.small{min-width:28px;width:28px}.day-heading h2{font-size:.9rem}.day-heading>span{font-size:.65rem}.search-box{padding:10px 11px}.search-box input{font-size:.75rem}.search-box kbd{display:none}.lesson-layout{grid-template-columns:48px minmax(0,1fr);gap:11px}.lesson-time{padding-top:17px}.lesson-time strong{font-size:.85rem}.lesson-time span{font-size:.65rem}.lesson-main{padding:15px 8px 15px 17px}.lesson-main h3{font-size:.87rem;line-height:1.45;margin:8px 0 10px}.lesson-meta{font-size:.65rem;gap:5px 10px}.lesson-top{font-size:.6rem;gap:6px}.type-tag{font-size:.6rem}.lesson-save{width:30px;min-width:30px;margin-right:3px}.lesson-card{border-radius:11px}.gap-label{margin-left:59px;font-size:.6rem}.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:calc(72px + max(env(safe-area-inset-bottom),var(--safe-bottom)));padding:8px 6px max(8px,env(safe-area-inset-bottom),var(--safe-bottom));background:var(--sidebar);border-top:1px solid var(--line);z-index:8;justify-content:space-around}.mobile-nav>button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:.6rem;color:var(--muted);flex:1;max-width:110px;min-height:48px}.mobile-nav>button svg{width:20px;height:20px}.mobile-nav>button.active{color:var(--mint)}.page-footer{padding-top:25px;font-size:.55rem;gap:7px;align-items:flex-start}.page-footer>span:first-child{display:none}.page-footer>span:last-child{width:100%;text-align:center}dialog{padding:20px;border-radius:18px;max-height:85dvh}.dialog-header~div h2{font-size:1.35rem}.dialog-description{font-size:.8rem}.group-option{padding:18px 15px}.detail-row{font-size:.85rem}#toast{bottom:calc(92px + var(--safe-bottom));width:max-content}.notice{font-size:.7rem;padding:10px 12px}.empty-state{padding:30px 18px}.empty-state p{font-size:.75rem}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}@supports not (backdrop-filter:blur(10px)){.glass{background:var(--surface-solid)}}
+.hero-status>svg{width:14px;height:14px}.paused .orbit-core{animation-play-state:paused}
+/* Keep task-critical text legible on compact Telegram viewports. */
+.hero-meta,.segmented>button,.day-button .day-name,.lesson-time span,.lesson-meta,.detail-row small,.text-button,.day-heading>span,.search-box input,.group-switch,.date-tag,.month-button,.calendar-grid>button,.notice,.primary-button,.secondary-button{font-size:.875rem}
+.lesson-main h3{font-size:1rem}.lesson-top,.type-tag{font-size:.75rem}.hero-bottom,.source-item p,.dialog-description{font-size:.875rem}.mobile-nav>button{font-size:.75rem}.day-button .day-number{font-size:1.2rem}.hero-status,.eyebrow{font-size:.75rem}.lesson-meta{line-height:1.6}.hero-meta{line-height:1.7}
+@media(max-width:600px){.hero-content{max-width:84%}.hero-meta{gap:5px 10px}.hero-status{font-size:.65rem}.eyebrow{font-size:.65rem}.segmented>button{padding:6px 10px}.lesson-meta>span{overflow-wrap:anywhere}.lesson-meta svg{width:14px;min-width:14px}.hero-orbit{opacity:.4}.mobile-nav{height:calc(78px + max(env(safe-area-inset-bottom),var(--safe-bottom)))}.hero{min-height:238px}}
+/* Let the timetable appear early while the next class remains easy to scan. */
+.hero{min-height:188px;padding-top:23px;padding-bottom:23px;margin-bottom:26px}.hero-orbit{transform:rotate(-28deg) scale(.85)}
+@media(max-width:600px){.hero{min-height:185px;padding:20px;margin-bottom:22px}.hero-content{max-width:100%}.hero h2{font-size:1.2rem;margin:8px 0}.hero-bottom{margin-top:11px}.hero-orbit{right:-115px;top:-6px;opacity:.25}.page-heading{margin-bottom:20px}main{padding-top:22px}.schedule-toolbar{margin-bottom:16px}.week-strip{margin-bottom:20px}}
+</style>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div><div class="ambient ambient-two" aria-hidden="true"></div>
+  <aside class="sidebar">
+    <a class="brand" href="#" aria-label="Расписание, главная"><span class="brand-mark">р<span>.</span></span><span>расписание<span class="brand-caption">ТВОЙ УЧЕБНЫЙ РИТМ</span></span></a>
+    <div class="sidebar-label">ПРОСТРАНСТВО</div>
+    <nav class="nav" aria-label="Навигация">
+      <button data-view="schedule" class="active"><span data-icon="calendar"></span><span>Расписание</span></button>
+      <button data-action="groups"><span data-icon="groups"></span><span>Мои группы</span><span class="nav-count">2</span></button>
+      <button data-view="saved"><span data-icon="bookmark"></span><span>Избранное</span></button>
+      <button data-action="sources"><span data-icon="layers"></span><span>Источники</span></button>
+    </nav>
+    <div class="sidebar-note"><span class="tiny-label">МЕНЬШЕ ХАОСА</span><p>Больше времени<br>на важное.</p><div class="note-line"></div><span>Все пары в одном месте</span></div>
+    <div class="sidebar-footer"><span class="version">v3.0</span><span>Сделано для твоего дня</span></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <span class="breadcrumb">Моё пространство <span>/</span> <b id="breadcrumb">Расписание</b></span>
+      <span class="mobile-brand">р<span>.</span></span>
+      <div class="top-actions"><button id="theme" class="icon-button" aria-label="Переключить тему"></button><button id="group-switch" class="group-switch" data-action="groups"><span class="group-avatar" id="group-avatar">ИБ</span><span id="group-name">ИБО-24</span><span data-icon="chevronDown"></span></button></div>
+    </header>
+    <main id="main">
+      <div class="page-heading"><div><div class="eyebrow" id="eyebrow">ТВОЙ ДЕНЬ ПОД КОНТРОЛЕМ</div><h1 id="page-title">Всё по расписанию<span>.</span></h1><p id="page-subtitle">Выбирай день. Остальное уже здесь.</p></div><div class="date-tag"><span data-icon="clock"></span><span id="current-date"></span><span class="timezone">МСК</span></div></div>
+      <section id="hero" class="hero glass" aria-label="Ближайшее занятие"></section>
+      <div class="content-grid">
+        <section class="schedule-column" aria-label="Расписание занятий">
+          <div class="schedule-toolbar"><div class="segmented" id="filters" aria-label="Фильтр расписания"><button data-filter="all" class="active">Все пары</button><button data-filter="main">Основное</button><button data-filter="cbi">ЦБИ<span class="cbi-dot"></span></button></div><button class="icon-button" data-action="export" aria-label="Скачать неделю в календарь" title="Скачать неделю в календарь"><span data-icon="download"></span></button></div>
+          <div class="week-heading"><button class="month-button" data-action="calendar"><span id="month-label"></span><span data-icon="chevronDown"></span></button><div class="week-actions"><button class="icon-button small" data-action="prev-week" aria-label="Предыдущая неделя"><span data-icon="chevronLeft"></span></button><button class="text-button" data-action="today">Сегодня</button><button class="icon-button small" data-action="next-week" aria-label="Следующая неделя"><span data-icon="chevronRight"></span></button></div></div>
+          <div class="week-strip" id="week-strip" aria-label="Дни недели"></div>
+          <div class="day-heading"><h2 id="day-title"></h2><span id="day-count"></span></div>
+          <label class="search-box"><span data-icon="search"></span><input id="search" type="search" placeholder="Найти предмет или аудиторию" aria-label="Найти предмет или аудиторию"><kbd>/</kbd></label>
+          <div id="notice"></div><div id="lessons" aria-live="polite"></div>
+        </section>
+        <aside class="insights" aria-label="Сводка недели">
+          <section class="glass week-card"><div class="panel-heading"><h2>Эта неделя</h2><span data-icon="chart"></span></div><p id="week-range" class="muted"></p><div class="week-total"><strong id="week-total">0</strong><span>пар в<br>расписании</span></div><div id="week-chart" class="week-chart"></div><div class="week-bottom"><span data-icon="clock"></span><span id="week-duration"></span></div></section>
+          <section class="glass cbi-card" id="cbi-card"><div class="cbi-label"><span data-icon="shield"></span>ДОПОЛНИТЕЛЬНОЕ ОБУЧЕНИЕ</div><h2>Практика в ЦБИ</h2><p>Темы, время и аудитории.<br>Всё рядом с основными парами.</p><button data-action="next-cbi" class="cbi-button">Ближайшее занятие<span data-icon="calendar"></span></button></section>
+          <section class="source-summary"><span data-icon="layers"></span><div><b>Расписание обновлено</b><span>23 ноября 2026</span><button data-action="sources">Посмотреть источники</button></div></section>
+        </aside>
+      </div>
+      <footer class="page-footer"><span>Учись в своём ритме.</span><span>МК1 · ИБО-24 <span class="footer-dot">/</span> Время по Москве</span></footer>
+    </main>
+  </div>
+  <nav class="mobile-nav" aria-label="Основная навигация"><button class="active" data-view="schedule"><span data-icon="calendar"></span>Расписание</button><button data-action="groups"><span data-icon="groups"></span>Группы</button><button data-view="saved"><span data-icon="bookmark"></span>Избранное</button><button data-action="sources"><span data-icon="layers"></span>Источники</button></nav>
+  <dialog id="dialog" aria-labelledby="dialog-title"><div class="dialog-header"><span class="eyebrow">ТВОЁ ПРОСТРАНСТВО</span><button class="icon-button" data-action="close" aria-label="Закрыть"><span data-icon="close"></span></button></div><div id="dialog-content"></div></dialog>
+  <div id="toast" role="status"></div>
+  <noscript><div class="noscript">Для интерактивного расписания включите JavaScript.</div></noscript>
+  <script id="schedule-data" type="application/json">{
   "groups": {
     "МК1": {
-      "subtitle": "СП № 5",
+      "subtitle": "Медицинское направление",
       "dates": {
         "2026-10-12": [
-          { "num": 2, "time": "10:50-12:20", "subject": "БЖ", "type": "лекция", "teacher": "Симкачев А.С.", "room": "СП № 5, 501" },
-          { "num": 3, "time": "12:30-14:00", "subject": "Анатомия", "type": "лекция", "teacher": "Галкина Г.Г.", "room": "СП № 5, 302" },
-          { "num": 4, "time": "14:10-15:40", "subject": "Фармакология", "type": "лекция", "teacher": "Байнова Ю.А.", "room": "СП № 5, 307" }
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "БЖ",
+            "type": "лекция",
+            "teacher": "Симкачев А.С.",
+            "room": "СП № 5, 501"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Анатомия",
+            "type": "лекция",
+            "teacher": "Галкина Г.Г.",
+            "room": "СП № 5, 302"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Фармакология",
+            "type": "лекция",
+            "teacher": "Байнова Ю.А.",
+            "room": "СП № 5, 307"
+          }
         ],
         "2026-10-13": [
-          { "num": 2, "time": "10:50-12:20", "subject": "Анатомия", "type": "практика", "teacher": "Галкина Г.Г.", "room": "СП № 5, 302" },
-          { "num": 3, "time": "12:30-14:00", "subject": "БЖ", "type": "лекция", "teacher": "Симкачев А.С.", "room": "СП № 5, 501" },
-          { "num": 4, "time": "14:10-15:40", "subject": "Фармакология", "type": "практика", "teacher": "Байнова Ю.А.", "room": "СП № 5, 307" }
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "Анатомия",
+            "type": "практика",
+            "teacher": "Галкина Г.Г.",
+            "room": "СП № 5, 302"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "БЖ",
+            "type": "лекция",
+            "teacher": "Симкачев А.С.",
+            "room": "СП № 5, 501"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Фармакология",
+            "type": "практика",
+            "teacher": "Байнова Ю.А.",
+            "room": "СП № 5, 307"
+          }
         ],
         "2026-10-14": [
-          { "num": 3, "time": "12:30-14:00", "subject": "МДК.03.02", "type": "лекция", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 4, "time": "14:10-15:40", "subject": "МДК.03.02", "type": "лекция", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 5, "time": "16:00-17:30", "subject": "Генетика", "type": "лекция", "teacher": "Добоева М.А.", "room": "СП № 5, 404" }
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "МДК.03.02",
+            "type": "лекция",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "МДК.03.02",
+            "type": "лекция",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 5,
+            "time": "16:00-17:30",
+            "subject": "Генетика",
+            "type": "лекция",
+            "teacher": "Добоева М.А.",
+            "room": "СП № 5, 404"
+          }
         ],
         "2026-10-15": [
-          { "num": 2, "time": "10:50-12:20", "subject": "Анатомия", "type": "практика", "teacher": "Галкина Г.Г.", "room": "СП № 5, 302" },
-          { "num": 3, "time": "12:30-14:00", "subject": "Общий уход", "type": "лекция", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 4, "time": "14:10-15:40", "subject": "Общий уход", "type": "лекция", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" }
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "Анатомия",
+            "type": "практика",
+            "teacher": "Галкина Г.Г.",
+            "room": "СП № 5, 302"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Общий уход",
+            "type": "лекция",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Общий уход",
+            "type": "лекция",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          }
         ],
         "2026-10-16": [
-          { "num": 3, "time": "12:30-14:00", "subject": "Документирование", "type": "практика", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 4, "time": "14:10-15:40", "subject": "Документирование", "type": "практика", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 5, "time": "16:00-17:30", "subject": "Генетика", "type": "практика", "teacher": "Добоева М.А.", "room": "СП № 5, 404" }
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Документирование",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Документирование",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 5,
+            "time": "16:00-17:30",
+            "subject": "Генетика",
+            "type": "практика",
+            "teacher": "Добоева М.А.",
+            "room": "СП № 5, 404"
+          }
         ],
         "2026-10-17": [
-          { "num": 2, "time": "10:50-12:20", "subject": "Анатомия", "type": "практика", "teacher": "Галкина Г.Г.", "room": "СП № 5, 302" },
-          { "num": 3, "time": "12:30-14:00", "subject": "Общий уход", "type": "лекция", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 4, "time": "14:10-15:40", "subject": "Общий уход", "type": "лекция", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" }
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "Анатомия",
+            "type": "практика",
+            "teacher": "Галкина Г.Г.",
+            "room": "СП № 5, 302"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Общий уход",
+            "type": "лекция",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Общий уход",
+            "type": "лекция",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          }
         ],
         "2026-10-19": [
-          { "num": 2, "time": "10:50-12:20", "subject": "Осн патологии", "type": "практика", "teacher": "Галкина Г.Г.", "room": "СП № 5, 302" },
-          { "num": 3, "time": "12:30-14:00", "subject": "Общий уход", "type": "практика", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 4, "time": "14:10-15:40", "subject": "Общий уход", "type": "практика", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" }
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "Осн патологии",
+            "type": "практика",
+            "teacher": "Галкина Г.Г.",
+            "room": "СП № 5, 302"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Общий уход",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Общий уход",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          }
         ],
         "2026-10-20": [
-          { "num": 2, "time": "10:50-12:20", "subject": "Анатомия", "type": "практика", "teacher": "Галкина Г.Г.", "room": "СП № 5, 302" },
-          { "num": 3, "time": "12:30-14:00", "subject": "БЖ", "type": "лекция", "teacher": "Симкачев А.С.", "room": "СП № 5, 501" }
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "Анатомия",
+            "type": "практика",
+            "teacher": "Галкина Г.Г.",
+            "room": "СП № 5, 302"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "БЖ",
+            "type": "лекция",
+            "teacher": "Симкачев А.С.",
+            "room": "СП № 5, 501"
+          }
         ],
         "2026-10-21": [
-          { "num": 2, "time": "10:50-12:20", "subject": "Общий уход", "type": "практика", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 3, "time": "12:30-14:00", "subject": "Общий уход", "type": "практика", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 4, "time": "14:10-15:40", "subject": "Анатомия", "type": "практика", "teacher": "Галкина Г.Г.", "room": "СП № 5, 302" }
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "Общий уход",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Общий уход",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Анатомия",
+            "type": "практика",
+            "teacher": "Галкина Г.Г.",
+            "room": "СП № 5, 302"
+          }
         ],
         "2026-10-22": [
-          { "num": 1, "time": "09:00-10:30", "subject": "Общий уход", "type": "практика", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 2, "time": "10:50-12:20", "subject": "Общий уход", "type": "практика", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 3, "time": "12:30-14:00", "subject": "Генетика", "type": "практика", "teacher": "Добоева М.А.", "room": "СП № 5, 404" }
+          {
+            "num": 1,
+            "time": "09:00-10:30",
+            "subject": "Общий уход",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "Общий уход",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Генетика",
+            "type": "практика",
+            "teacher": "Добоева М.А.",
+            "room": "СП № 5, 404"
+          }
         ],
         "2026-10-23": [
-          { "num": 1, "time": "09:00-10:30", "subject": "Общий уход", "type": "практика", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 2, "time": "10:50-12:20", "subject": "Общий уход", "type": "практика", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 3, "time": "12:30-14:00", "subject": "Генетика", "type": "практика", "teacher": "Добоева М.А.", "room": "СП № 5, 404" }
+          {
+            "num": 1,
+            "time": "09:00-10:30",
+            "subject": "Общий уход",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "Общий уход",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Генетика",
+            "type": "практика",
+            "teacher": "Добоева М.А.",
+            "room": "СП № 5, 404"
+          }
         ],
         "2026-10-24": [
-          { "num": 2, "time": "10:50-12:20", "subject": "Анатомия", "type": "практика", "teacher": "Галкина Г.Г.", "room": "СП № 5, 302" },
-          { "num": 3, "time": "12:30-14:00", "subject": "Общий уход", "type": "лекция", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" },
-          { "num": 4, "time": "14:10-15:40", "subject": "Общий уход", "type": "лекция", "teacher": "Гузякова Л.Ю.", "room": "СП № 5, 205" }
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "Анатомия",
+            "type": "практика",
+            "teacher": "Галкина Г.Г.",
+            "room": "СП № 5, 302"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Общий уход",
+            "type": "лекция",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Общий уход",
+            "type": "лекция",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205"
+          }
+        ],
+        "2026-11-23": [
+          {
+            "num": 1,
+            "time": "09:00-10:30",
+            "subject": "Документирование",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205",
+            "source": "mk-nov"
+          },
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "Документирование",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205",
+            "source": "mk-nov"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Документирование",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205",
+            "source": "mk-nov"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Генетика",
+            "type": "практика",
+            "teacher": "Добоева М.А.",
+            "room": "СП № 5, 404",
+            "source": "mk-nov"
+          }
+        ],
+        "2026-11-24": [
+          {
+            "num": 1,
+            "time": "09:00-10:30",
+            "subject": "Основы микробиологии",
+            "type": "практика",
+            "teacher": "Добоева М.А.",
+            "room": "СП № 5, 404",
+            "source": "mk-nov"
+          },
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "БЖ",
+            "type": "лекция",
+            "teacher": "Симкачев А.С.",
+            "room": "СП № 5, 501",
+            "source": "mk-nov"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Основы микробиологии",
+            "type": "практика",
+            "teacher": "Добоева М.А.",
+            "room": "СП № 5, 404",
+            "source": "mk-nov"
+          }
+        ],
+        "2026-11-25": [
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "Фармакология",
+            "type": "практика",
+            "teacher": "Байнова Ю.А.",
+            "room": "СП № 5, 307",
+            "source": "mk-nov"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Физическая культура",
+            "type": "практика",
+            "teacher": "Серова Е.А.",
+            "room": "СП № 5, 215",
+            "source": "mk-nov"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "ИЯПД",
+            "type": "практика",
+            "teacher": "Христолюбова Е.С.",
+            "room": "СП № 5, 208",
+            "source": "mk-nov"
+          },
+          {
+            "num": 5,
+            "time": "16:00-17:30",
+            "subject": "Анатомия",
+            "type": "практика",
+            "teacher": "Галкина Г.Г.",
+            "room": "СП № 5, 302",
+            "source": "mk-nov"
+          }
+        ],
+        "2026-11-26": [
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "ИТПД",
+            "type": "практика",
+            "teacher": "Раковская Е.Л.",
+            "room": "СП № 5, 209",
+            "source": "mk-nov"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Генетика",
+            "type": "практика",
+            "teacher": "Добоева М.А.",
+            "room": "СП № 5, 404",
+            "source": "mk-nov"
+          }
+        ],
+        "2026-11-27": [
+          {
+            "num": 1,
+            "time": "09:00-10:30",
+            "subject": "С/у_ТП",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205",
+            "source": "mk-nov"
+          },
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "С/у_ТП",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205",
+            "source": "mk-nov"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "С/у_ТП",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205",
+            "source": "mk-nov"
+          }
+        ],
+        "2026-11-28": [
+          {
+            "num": 1,
+            "time": "09:00-10:30",
+            "subject": "С/у_ТП",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205",
+            "source": "mk-nov"
+          },
+          {
+            "num": 2,
+            "time": "10:50-12:20",
+            "subject": "С/у_ТП",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205",
+            "source": "mk-nov"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "С/у_ТП",
+            "type": "практика",
+            "teacher": "Гузякова Л.Ю.",
+            "room": "СП № 5, 205",
+            "source": "mk-nov"
+          }
         ]
       }
     },
-
     "ИБО-24": {
-      "subtitle": "ООО ЦБИ",
+      "subtitle": "Информационная безопасность",
       "dates": {
         "2026-10-05": [
-          { "num": 1, "time": "09:00-10:30", "subject": "Электроника и схемотехника", "type": "лекция", "room": "1302" },
-          { "num": 2, "time": "10:40-12:10", "subject": "Электроника и схемотехника", "type": "практика", "room": "1302" },
-          { "num": 3, "time": "12:30-14:00", "subject": "Основы радиоэлектронной разведки (РЭР)", "type": "практика", "room": "1204" },
-          { "num": 4, "time": "14:10-15:40", "subject": "Основы радиоэлектронной разведки (РЭР)", "type": "практика", "room": "1204" }
+          {
+            "num": 1,
+            "time": "09:00-10:30",
+            "subject": "Электроника и схемотехника",
+            "type": "лекция",
+            "room": "1302"
+          },
+          {
+            "num": 2,
+            "time": "10:40-12:10",
+            "subject": "Электроника и схемотехника",
+            "type": "практика",
+            "room": "1302"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Основы радиоэлектронной разведки (РЭР)",
+            "type": "практика",
+            "room": "1204"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Основы радиоэлектронной разведки (РЭР)",
+            "type": "практика",
+            "room": "1204"
+          }
         ],
         "2026-10-06": [
-          { "num": 3, "time": "12:30-14:00", "subject": "Элективные курсы по физической культуре и спорту", "type": "практика", "room": "Стадион Вымпел (1)" },
-          { "num": 4, "time": "14:10-15:40", "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот", "type": "практика", "room": "2210" },
-          { "num": 5, "time": "15:50-17:20", "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот", "type": "лабораторная", "room": "2210" },
-          { "num": 6, "time": "17:25-18:55", "subject": "Защита общества от информации, запрещенной к распространению", "type": "практика", "room": "2210" }
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Элективные курсы по физической культуре и спорту",
+            "type": "практика",
+            "room": "Стадион Вымпел (1)"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот",
+            "type": "практика",
+            "room": "2210"
+          },
+          {
+            "num": 5,
+            "time": "15:50-17:20",
+            "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот",
+            "type": "лабораторная",
+            "room": "2210"
+          },
+          {
+            "num": 6,
+            "time": "17:25-18:55",
+            "subject": "Защита общества от информации, запрещенной к распространению",
+            "type": "практика",
+            "room": "2210"
+          }
         ],
         "2026-10-07": [
-          { "num": 4, "time": "14:10-15:40", "subject": "Дискретная математика", "type": "лекция", "room": "2202" },
-          { "num": 5, "time": "15:50-17:20", "subject": "Дискретная математика", "type": "практика", "room": "2202" },
-          { "num": 6, "time": "17:25-18:55", "subject": "История защиты информации в РФ", "type": "практика", "room": "2401" }
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Дискретная математика",
+            "type": "лекция",
+            "room": "2202"
+          },
+          {
+            "num": 5,
+            "time": "15:50-17:20",
+            "subject": "Дискретная математика",
+            "type": "практика",
+            "room": "2202"
+          },
+          {
+            "num": 6,
+            "time": "17:25-18:55",
+            "subject": "История защиты информации в РФ",
+            "type": "практика",
+            "room": "2401"
+          }
         ],
         "2026-10-09": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Защита информации от НСД", "topic": "Тема 3. Организация выполнения работ по защите информации от НСД", "type": "лекция", "room": "БК - ЦБИ" },
-          { "num": 4, "time": "14:10-15:40", "subject": "Технологии и методы программирования", "type": "лабораторная", "room": "1212" },
-          { "num": 5, "time": "15:50-17:20", "subject": "Технологии и методы программирования", "type": "практика", "room": "1212" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Тема 3. Организация выполнения работ по защите информации от НСД",
+            "type": "лекция",
+            "room": "БК - ЦБИ"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Технологии и методы программирования",
+            "type": "лабораторная",
+            "room": "1212"
+          },
+          {
+            "num": 5,
+            "time": "15:50-17:20",
+            "subject": "Технологии и методы программирования",
+            "type": "практика",
+            "room": "1212"
+          }
         ],
         "2026-10-10": [
-          { "num": 1, "time": "09:00-10:30", "subject": "Информационные технологии", "type": "лекция", "room": "2210" },
-          { "num": 2, "time": "10:40-12:10", "subject": "Информационные технологии", "type": "практика", "room": "2210" }
+          {
+            "num": 1,
+            "time": "09:00-10:30",
+            "subject": "Информационные технологии",
+            "type": "лекция",
+            "room": "2210"
+          },
+          {
+            "num": 2,
+            "time": "10:40-12:10",
+            "subject": "Информационные технологии",
+            "type": "практика",
+            "room": "2210"
+          }
         ],
         "2026-10-12": [
-          { "num": 1, "time": "09:00-10:30", "subject": "Электроника и схемотехника", "type": "лекция", "room": "1302" },
-          { "num": 2, "time": "10:40-12:10", "subject": "Электроника и схемотехника", "type": "практика", "room": "1302" },
-          { "num": 3, "time": "12:30-14:00", "subject": "Основы радиоэлектронной разведки (РЭР)", "type": "лекция", "room": "1212" },
-          { "num": 4, "time": "14:10-15:40", "subject": "Электроника и схемотехника", "type": "лабораторная", "room": "1302" }
+          {
+            "num": 1,
+            "time": "09:00-10:30",
+            "subject": "Электроника и схемотехника",
+            "type": "лекция",
+            "room": "1302"
+          },
+          {
+            "num": 2,
+            "time": "10:40-12:10",
+            "subject": "Электроника и схемотехника",
+            "type": "практика",
+            "room": "1302"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Основы радиоэлектронной разведки (РЭР)",
+            "type": "лекция",
+            "room": "1212"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Электроника и схемотехника",
+            "type": "лабораторная",
+            "room": "1302"
+          }
         ],
         "2026-10-13": [
-          { "num": 3, "time": "12:30-14:00", "subject": "Элективные курсы по физической культуре и спорту", "type": "практика", "room": "Стадион Вымпел (1)" },
-          { "num": 4, "time": "14:10-15:40", "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот", "type": "лекция", "room": "2210" },
-          { "num": 5, "time": "15:50-17:20", "subject": "Защита общества от информации, запрещенной к распространению", "type": "лабораторная", "room": "2210" },
-          { "num": 6, "time": "17:25-18:55", "subject": "Защита общества от информации, запрещенной к распространению", "type": "лекция", "room": "2210" }
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Элективные курсы по физической культуре и спорту",
+            "type": "практика",
+            "room": "Стадион Вымпел (1)"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот",
+            "type": "лекция",
+            "room": "2210"
+          },
+          {
+            "num": 5,
+            "time": "15:50-17:20",
+            "subject": "Защита общества от информации, запрещенной к распространению",
+            "type": "лабораторная",
+            "room": "2210"
+          },
+          {
+            "num": 6,
+            "time": "17:25-18:55",
+            "subject": "Защита общества от информации, запрещенной к распространению",
+            "type": "лекция",
+            "room": "2210"
+          }
         ],
         "2026-10-14": [
-          { "num": 1, "time": "10:00-11:50", "subject": "Аттестация объекта информатизации по требованиям безопасности информации", "topic": "Подготовка и проведение анализа защищенности ЛВС организации", "type": "практика", "room": "БК - ЦБИ" },
-          { "num": 2, "time": "12:00-14:00", "subject": "Защита информации от НСД", "topic": "Тема 4. Методология проведения информационного обследования информационных (автоматизированных) систем в части вопросов защиты информации", "type": "практика", "room": "БК - ЦБИ" },
-          { "num": 5, "time": "15:50-17:20", "subject": "История защиты информации в РФ", "type": "лекция", "room": "2401" },
-          { "num": 6, "time": "17:25-18:55", "subject": "История защиты информации в РФ", "type": "практика", "room": "2401" }
+          {
+            "num": 1,
+            "time": "10:00-11:50",
+            "subject": "Аттестация объекта информатизации по требованиям безопасности информации",
+            "topic": "Подготовка и проведение анализа защищенности ЛВС организации",
+            "type": "практика",
+            "room": "БК - ЦБИ"
+          },
+          {
+            "num": 2,
+            "time": "12:00-14:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Тема 4. Методология проведения информационного обследования информационных (автоматизированных) систем в части вопросов защиты информации",
+            "type": "практика",
+            "room": "БК - ЦБИ"
+          },
+          {
+            "num": 5,
+            "time": "15:50-17:20",
+            "subject": "История защиты информации в РФ",
+            "type": "лекция",
+            "room": "2401"
+          },
+          {
+            "num": 6,
+            "time": "17:25-18:55",
+            "subject": "История защиты информации в РФ",
+            "type": "практика",
+            "room": "2401"
+          }
+        ],
+        "2026-11-14": [
+          {
+            "num": 1,
+            "time": "09:00-10:30",
+            "subject": "Нормативные акты и стандарты по информационной безопасности",
+            "type": "лекция",
+            "teacher": "Сухотерин А.И.",
+            "room": "2210",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 2,
+            "time": "10:40-12:10",
+            "subject": "Нормативные акты и стандарты по информационной безопасности",
+            "type": "практика",
+            "teacher": "Сухотерин А.И.",
+            "room": "2210",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Нормативные акты и стандарты по информационной безопасности",
+            "type": "лабораторная",
+            "teacher": "Сухотерин А.И.",
+            "room": "2210",
+            "source": "ibo-nov"
+          }
+        ],
+        "2026-11-16": [
+          {
+            "num": 1,
+            "time": "09:00-10:30",
+            "subject": "Электроника и схемотехника",
+            "type": "лекция",
+            "teacher": "Павлов В.А.",
+            "room": "1302",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 2,
+            "time": "10:40-12:10",
+            "subject": "Электроника и схемотехника",
+            "type": "практика",
+            "teacher": "Павлов В.А.",
+            "room": "1302",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Основы радиоэлектронной разведки (РЭР)",
+            "type": "практика",
+            "teacher": "Краснобаева И.А.",
+            "room": "1204",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Основы радиоэлектронной разведки (РЭР)",
+            "type": "практика",
+            "teacher": "Краснобаева И.А.",
+            "room": "1204",
+            "source": "ibo-nov"
+          }
+        ],
+        "2026-11-17": [
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Элективные курсы по физической культуре и спорту",
+            "type": "практика",
+            "teacher": "Живулин К.В.",
+            "room": "Стадион Вымпел (1)",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот",
+            "type": "практика",
+            "teacher": "Забелин В.О.",
+            "room": "2210",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 5,
+            "time": "15:50-17:20",
+            "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот",
+            "type": "лабораторная",
+            "teacher": "Забелин В.О.",
+            "room": "2210",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 6,
+            "time": "17:25-18:55",
+            "subject": "Защита общества от информации, запрещенной к распространению",
+            "type": "практика",
+            "teacher": "Коба Е.Е.",
+            "room": "2210",
+            "source": "ibo-nov"
+          }
+        ],
+        "2026-11-18": [
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Дискретная математика",
+            "type": "лекция",
+            "teacher": "Погодина Ю.А.",
+            "room": "2202",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 5,
+            "time": "15:50-17:20",
+            "subject": "Дискретная математика",
+            "type": "практика",
+            "teacher": "Погодина Ю.А.",
+            "room": "2202",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 6,
+            "time": "17:25-18:55",
+            "subject": "История защиты информации в РФ",
+            "type": "практика",
+            "teacher": "Коба Е.Е.",
+            "room": "2401",
+            "source": "ibo-nov"
+          }
+        ],
+        "2026-11-20": [
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Формирование набора мер защиты информации для информационных систем",
+            "type": "практика",
+            "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.",
+            "room": "БК - ЦБИ",
+            "kind": "cbi",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Технологии и методы программирования",
+            "type": "лабораторная",
+            "teacher": "Парафейников И.В.",
+            "room": "1212",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 5,
+            "time": "15:50-17:20",
+            "subject": "Технологии и методы программирования",
+            "type": "практика",
+            "teacher": "Парафейников И.В.",
+            "room": "1212",
+            "source": "ibo-nov"
+          }
+        ],
+        "2026-11-21": [
+          {
+            "num": 1,
+            "time": "09:00-10:30",
+            "subject": "Информационные технологии",
+            "type": "лекция",
+            "teacher": "Воронов А.Н.",
+            "room": "2210",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 2,
+            "time": "10:40-12:10",
+            "subject": "Информационные технологии",
+            "type": "практика",
+            "teacher": "Воронов А.Н.",
+            "room": "2210",
+            "source": "ibo-nov"
+          }
+        ],
+        "2026-11-23": [
+          {
+            "num": 1,
+            "time": "09:00-10:30",
+            "subject": "Электроника и схемотехника",
+            "type": "лекция",
+            "teacher": "Павлов В.А.",
+            "room": "1302",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 2,
+            "time": "10:40-12:10",
+            "subject": "Электроника и схемотехника",
+            "type": "практика",
+            "teacher": "Павлов В.А.",
+            "room": "1302",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 3,
+            "time": "12:30-14:00",
+            "subject": "Основы радиоэлектронной разведки (РЭР)",
+            "type": "лекция",
+            "teacher": "Краснобаева И.А.",
+            "room": "1212",
+            "source": "ibo-nov"
+          },
+          {
+            "num": 4,
+            "time": "14:10-15:40",
+            "subject": "Электроника и схемотехника",
+            "type": "лабораторная",
+            "teacher": "Павлов В.А.",
+            "room": "1302",
+            "source": "ibo-nov"
+          }
         ]
       },
       "cycle": [
@@ -137,55 +1017,251 @@
           "weeks": [
             {
               "monday": [
-                { "num": 1, "time": "09:00-10:30", "subject": "Электроника и схемотехника", "type": "лекция", "teacher": "Павлов В.А.", "room": "1302" },
-                { "num": 2, "time": "10:40-12:10", "subject": "Электроника и схемотехника", "type": "практика", "teacher": "Павлов В.А.", "room": "1302" },
-                { "num": 3, "time": "12:30-14:00", "subject": "Основы радиоэлектронной разведки (РЭР)", "type": "лекция", "teacher": "Краснобаева И.А.", "room": "1212" },
-                { "num": 4, "time": "14:10-15:40", "subject": "Электроника и схемотехника", "type": "лабораторная", "teacher": "Павлов В.А.", "room": "1302" }
+                {
+                  "num": 1,
+                  "time": "09:00-10:30",
+                  "subject": "Электроника и схемотехника",
+                  "type": "лекция",
+                  "teacher": "Павлов В.А.",
+                  "room": "1302"
+                },
+                {
+                  "num": 2,
+                  "time": "10:40-12:10",
+                  "subject": "Электроника и схемотехника",
+                  "type": "практика",
+                  "teacher": "Павлов В.А.",
+                  "room": "1302"
+                },
+                {
+                  "num": 3,
+                  "time": "12:30-14:00",
+                  "subject": "Основы радиоэлектронной разведки (РЭР)",
+                  "type": "лекция",
+                  "teacher": "Краснобаева И.А.",
+                  "room": "1212"
+                },
+                {
+                  "num": 4,
+                  "time": "14:10-15:40",
+                  "subject": "Электроника и схемотехника",
+                  "type": "лабораторная",
+                  "teacher": "Павлов В.А.",
+                  "room": "1302"
+                }
               ],
               "tuesday": [
-                { "num": 3, "time": "12:30-14:00", "subject": "Элективные курсы по физической культуре и спорту", "type": "практика", "teacher": "Живулин К.В.", "room": "Стадион Вымпел (1)" },
-                { "num": 4, "time": "14:10-15:40", "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот", "type": "лекция", "teacher": "Забелин В.О.", "room": "2210" },
-                { "num": 5, "time": "15:50-17:20", "subject": "Защита общества от информации, запрещенной к распространению", "type": "лабораторная", "teacher": "Коба Е.Е.", "room": "2210" },
-                { "num": 6, "time": "17:25-18:55", "subject": "Защита общества от информации, запрещенной к распространению", "type": "лекция", "teacher": "Коба Е.Е.", "room": "2210" }
+                {
+                  "num": 3,
+                  "time": "12:30-14:00",
+                  "subject": "Элективные курсы по физической культуре и спорту",
+                  "type": "практика",
+                  "teacher": "Живулин К.В.",
+                  "room": "Стадион Вымпел (1)"
+                },
+                {
+                  "num": 4,
+                  "time": "14:10-15:40",
+                  "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот",
+                  "type": "лекция",
+                  "teacher": "Забелин В.О.",
+                  "room": "2210"
+                },
+                {
+                  "num": 5,
+                  "time": "15:50-17:20",
+                  "subject": "Защита общества от информации, запрещенной к распространению",
+                  "type": "лабораторная",
+                  "teacher": "Коба Е.Е.",
+                  "room": "2210"
+                },
+                {
+                  "num": 6,
+                  "time": "17:25-18:55",
+                  "subject": "Защита общества от информации, запрещенной к распространению",
+                  "type": "лекция",
+                  "teacher": "Коба Е.Е.",
+                  "room": "2210"
+                }
               ],
               "wednesday": [
-                { "num": 5, "time": "15:50-17:20", "subject": "История защиты информации в РФ", "type": "лекция", "teacher": "Коба Е.Е.", "room": "2401" },
-                { "num": 6, "time": "17:25-18:55", "subject": "История защиты информации в РФ", "type": "практика", "teacher": "Коба Е.Е.", "room": "2401" }
+                {
+                  "num": 5,
+                  "time": "15:50-17:20",
+                  "subject": "История защиты информации в РФ",
+                  "type": "лекция",
+                  "teacher": "Коба Е.Е.",
+                  "room": "2401"
+                },
+                {
+                  "num": 6,
+                  "time": "17:25-18:55",
+                  "subject": "История защиты информации в РФ",
+                  "type": "практика",
+                  "teacher": "Коба Е.Е.",
+                  "room": "2401"
+                }
               ],
               "thursday": [],
               "saturday": [
-                { "num": 1, "time": "09:00-10:30", "subject": "Нормативные акты и стандарты по информационной безопасности", "type": "лекция", "teacher": "Сухотерин А.И.", "room": "2210" },
-                { "num": 2, "time": "10:40-12:10", "subject": "Нормативные акты и стандарты по информационной безопасности", "type": "практика", "teacher": "Сухотерин А.И.", "room": "2210" },
-                { "num": 3, "time": "12:30-14:00", "subject": "Нормативные акты и стандарты по информационной безопасности", "type": "лабораторная", "teacher": "Сухотерин А.И.", "room": "2210" }
+                {
+                  "num": 1,
+                  "time": "09:00-10:30",
+                  "subject": "Нормативные акты и стандарты по информационной безопасности",
+                  "type": "лекция",
+                  "teacher": "Сухотерин А.И.",
+                  "room": "2210"
+                },
+                {
+                  "num": 2,
+                  "time": "10:40-12:10",
+                  "subject": "Нормативные акты и стандарты по информационной безопасности",
+                  "type": "практика",
+                  "teacher": "Сухотерин А.И.",
+                  "room": "2210"
+                },
+                {
+                  "num": 3,
+                  "time": "12:30-14:00",
+                  "subject": "Нормативные акты и стандарты по информационной безопасности",
+                  "type": "лабораторная",
+                  "teacher": "Сухотерин А.И.",
+                  "room": "2210"
+                }
               ],
               "sunday": []
             },
             {
               "monday": [
-                { "num": 1, "time": "09:00-10:30", "subject": "Электроника и схемотехника", "type": "лекция", "teacher": "Павлов В.А.", "room": "1302" },
-                { "num": 2, "time": "10:40-12:10", "subject": "Электроника и схемотехника", "type": "практика", "teacher": "Павлов В.А.", "room": "1302" },
-                { "num": 3, "time": "12:30-14:00", "subject": "Основы радиоэлектронной разведки (РЭР)", "type": "практика", "teacher": "Краснобаева И.А.", "room": "1204" },
-                { "num": 4, "time": "14:10-15:40", "subject": "Основы радиоэлектронной разведки (РЭР)", "type": "практика", "teacher": "Краснобаева И.А.", "room": "1204" }
+                {
+                  "num": 1,
+                  "time": "09:00-10:30",
+                  "subject": "Электроника и схемотехника",
+                  "type": "лекция",
+                  "teacher": "Павлов В.А.",
+                  "room": "1302"
+                },
+                {
+                  "num": 2,
+                  "time": "10:40-12:10",
+                  "subject": "Электроника и схемотехника",
+                  "type": "практика",
+                  "teacher": "Павлов В.А.",
+                  "room": "1302"
+                },
+                {
+                  "num": 3,
+                  "time": "12:30-14:00",
+                  "subject": "Основы радиоэлектронной разведки (РЭР)",
+                  "type": "практика",
+                  "teacher": "Краснобаева И.А.",
+                  "room": "1204"
+                },
+                {
+                  "num": 4,
+                  "time": "14:10-15:40",
+                  "subject": "Основы радиоэлектронной разведки (РЭР)",
+                  "type": "практика",
+                  "teacher": "Краснобаева И.А.",
+                  "room": "1204"
+                }
               ],
               "tuesday": [
-                { "num": 3, "time": "12:30-14:00", "subject": "Элективные курсы по физической культуре и спорту", "type": "практика", "teacher": "Живулин К.В.", "room": "Стадион Вымпел (1)" },
-                { "num": 4, "time": "14:10-15:40", "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот", "type": "практика", "teacher": "Забелин В.О.", "room": "2210" },
-                { "num": 5, "time": "15:50-17:20", "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот", "type": "лабораторная", "teacher": "Забелин В.О.", "room": "2210" },
-                { "num": 6, "time": "17:25-18:55", "subject": "Защита общества от информации, запрещенной к распространению", "type": "практика", "teacher": "Коба Е.Е.", "room": "2210" }
+                {
+                  "num": 3,
+                  "time": "12:30-14:00",
+                  "subject": "Элективные курсы по физической культуре и спорту",
+                  "type": "практика",
+                  "teacher": "Живулин К.В.",
+                  "room": "Стадион Вымпел (1)"
+                },
+                {
+                  "num": 4,
+                  "time": "14:10-15:40",
+                  "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот",
+                  "type": "практика",
+                  "teacher": "Забелин В.О.",
+                  "room": "2210"
+                },
+                {
+                  "num": 5,
+                  "time": "15:50-17:20",
+                  "subject": "Конфиденциальное делопроизводство и защищенный электронный документооборот",
+                  "type": "лабораторная",
+                  "teacher": "Забелин В.О.",
+                  "room": "2210"
+                },
+                {
+                  "num": 6,
+                  "time": "17:25-18:55",
+                  "subject": "Защита общества от информации, запрещенной к распространению",
+                  "type": "практика",
+                  "teacher": "Коба Е.Е.",
+                  "room": "2210"
+                }
               ],
               "wednesday": [
-                { "num": 4, "time": "14:10-15:40", "subject": "Дискретная математика", "type": "лекция", "teacher": "Погодина Ю.А.", "room": "2202" },
-                { "num": 5, "time": "15:50-17:20", "subject": "Дискретная математика", "type": "практика", "teacher": "Погодина Ю.А.", "room": "2202" },
-                { "num": 6, "time": "17:25-18:55", "subject": "История защиты информации в РФ", "type": "практика", "teacher": "Коба Е.Е.", "room": "2401" }
+                {
+                  "num": 4,
+                  "time": "14:10-15:40",
+                  "subject": "Дискретная математика",
+                  "type": "лекция",
+                  "teacher": "Погодина Ю.А.",
+                  "room": "2202"
+                },
+                {
+                  "num": 5,
+                  "time": "15:50-17:20",
+                  "subject": "Дискретная математика",
+                  "type": "практика",
+                  "teacher": "Погодина Ю.А.",
+                  "room": "2202"
+                },
+                {
+                  "num": 6,
+                  "time": "17:25-18:55",
+                  "subject": "История защиты информации в РФ",
+                  "type": "практика",
+                  "teacher": "Коба Е.Е.",
+                  "room": "2401"
+                }
               ],
               "thursday": [],
               "friday": [
-                { "num": 4, "time": "14:10-15:40", "subject": "Технологии и методы программирования", "type": "лабораторная", "teacher": "Парафейников И.В.", "room": "1212" },
-                { "num": 5, "time": "15:50-17:20", "subject": "Технологии и методы программирования", "type": "практика", "teacher": "Парафейников И.В.", "room": "1212" }
+                {
+                  "num": 4,
+                  "time": "14:10-15:40",
+                  "subject": "Технологии и методы программирования",
+                  "type": "лабораторная",
+                  "teacher": "Парафейников И.В.",
+                  "room": "1212"
+                },
+                {
+                  "num": 5,
+                  "time": "15:50-17:20",
+                  "subject": "Технологии и методы программирования",
+                  "type": "практика",
+                  "teacher": "Парафейников И.В.",
+                  "room": "1212"
+                }
               ],
               "saturday": [
-                { "num": 1, "time": "09:00-10:30", "subject": "Информационные технологии", "type": "лекция", "teacher": "Воронов А.Н.", "room": "2210" },
-                { "num": 2, "time": "10:40-12:10", "subject": "Информационные технологии", "type": "практика", "teacher": "Воронов А.Н.", "room": "2210" }
+                {
+                  "num": 1,
+                  "time": "09:00-10:30",
+                  "subject": "Информационные технологии",
+                  "type": "лекция",
+                  "teacher": "Воронов А.Н.",
+                  "room": "2210"
+                },
+                {
+                  "num": 2,
+                  "time": "10:40-12:10",
+                  "subject": "Информационные технологии",
+                  "type": "практика",
+                  "teacher": "Воронов А.Н.",
+                  "room": "2210"
+                }
               ],
               "sunday": []
             }
@@ -194,403 +1270,401 @@
       ],
       "extra": {
         "2026-09-02": [
-          { "num": 1, "time": "10:00-11:00", "subject": "Вводная лекция", "type": "лекция", "teacher": "Сидак А.А., Рыженко С.В., Радионов В.В.", "room": "БК - ЦБИ" },
-          { "num": 2, "time": "11:00-14:00", "subject": "Экскурсия", "type": "экскурсия", "teacher": "Рыженко С.В., Радионов В.В., Привалов В.И.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-11:00",
+            "subject": "Вводная лекция",
+            "type": "лекция",
+            "teacher": "Сидак А.А., Рыженко С.В., Радионов В.В.",
+            "room": "БК - ЦБИ"
+          },
+          {
+            "num": 2,
+            "time": "11:00-14:00",
+            "subject": "Экскурсия",
+            "type": "экскурсия",
+            "teacher": "Рыженко С.В., Радионов В.В., Привалов В.И.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-09-04": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Технические каналы утечки информации", "topic": "Тема 1. Классификация ТК утечки информации и источников угроз безопасности информации", "type": "лекция", "teacher": "Воловоденко Б.Н., ДСИ (Юдин Г.В.), Рыженко С.В.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Технические каналы утечки информации",
+            "topic": "Тема 1. Классификация ТК утечки информации и источников угроз безопасности информации",
+            "type": "лекция",
+            "teacher": "Воловоденко Б.Н., ДСИ (Юдин Г.В.), Рыженко С.В.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-09-11": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Защита информации от НСД", "topic": "Тема 1. Требования о защите информации, содержащейся в государственных информационных системах, иных информационных системах государственных органов, государственных унитарных предприятий, государственных учреждений", "type": "лекция", "teacher": "Кудряшов И.И., Матвеев С.В., Рулёв А.С.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Тема 1. Требования о защите информации, содержащейся в государственных информационных системах, иных информационных системах государственных органов, государственных унитарных предприятий, государственных учреждений",
+            "type": "лекция",
+            "teacher": "Кудряшов И.И., Матвеев С.В., Рулёв А.С.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-09-16": [
-          { "num": 1, "time": "10:00-11:50", "subject": "Аттестация объекта информатизации по требованиям безопасности информации", "topic": "Тема 1. Подготовка и проведение аттестационных испытаний. Особенности эксплуатации аттестованных информационных систем", "type": "лекция", "teacher": "Верясов Н.В., Грасмик А.В., Демьянов Д.И.", "room": "БК - ЦБИ" },
-          { "num": 2, "time": "12:00-14:00", "subject": "Защита информации от НСД", "topic": "Классификация и категорированию объектов КИИ", "type": "практика", "teacher": "Черкасов, Василенко В.В., Рулёв А.С.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-11:50",
+            "subject": "Аттестация объекта информатизации по требованиям безопасности информации",
+            "topic": "Тема 1. Подготовка и проведение аттестационных испытаний. Особенности эксплуатации аттестованных информационных систем",
+            "type": "лекция",
+            "teacher": "Верясов Н.В., Грасмик А.В., Демьянов Д.И.",
+            "room": "БК - ЦБИ"
+          },
+          {
+            "num": 2,
+            "time": "12:00-14:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Классификация и категорированию объектов КИИ",
+            "type": "практика",
+            "teacher": "Черкасов, Василенко В.В., Рулёв А.С.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-09-18": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Технические каналы утечки информации", "topic": "Тема 2. Каналы утечки АРИ по акустическому и виброакустическому каналам", "type": "лекция", "teacher": "Воловоденко Б.Н., ДСИ (Лепехин В.В.), Рыженко С.В.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Технические каналы утечки информации",
+            "topic": "Тема 2. Каналы утечки АРИ по акустическому и виброакустическому каналам",
+            "type": "лекция",
+            "teacher": "Воловоденко Б.Н., ДСИ (Лепехин В.В.), Рыженко С.В.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-09-25": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Защита информации от НСД", "topic": "Тема 2. Определение угроз безопасности информации в информационных системах", "type": "лекция", "teacher": "Кудряшов И.И, Верясов М.В., Черкасов Д.С.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Тема 2. Определение угроз безопасности информации в информационных системах",
+            "type": "лекция",
+            "teacher": "Кудряшов И.И, Верясов М.В., Черкасов Д.С.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-09-30": [
-          { "num": 1, "time": "10:00-11:50", "subject": "Аттестация объекта информатизации по требованиям безопасности информации", "topic": "Разработка программы и методик аттестационных испытаний. Проведение функциональных тестов в ходе аттестационных испытаний", "type": "практика", "teacher": "Верясов Н.В., Грасмик А.В., Демьянов Д.И.", "room": "БК - ЦБИ" },
-          { "num": 2, "time": "12:00-14:00", "subject": "Защита информации от НСД", "topic": "Разработка модели угроз безопасности информации для информационных систем", "type": "практика", "teacher": "Верясов М.В., Кудряшов И.И, Черкасов Д.С.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-11:50",
+            "subject": "Аттестация объекта информатизации по требованиям безопасности информации",
+            "topic": "Разработка программы и методик аттестационных испытаний. Проведение функциональных тестов в ходе аттестационных испытаний",
+            "type": "практика",
+            "teacher": "Верясов Н.В., Грасмик А.В., Демьянов Д.И.",
+            "room": "БК - ЦБИ"
+          },
+          {
+            "num": 2,
+            "time": "12:00-14:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Разработка модели угроз безопасности информации для информационных систем",
+            "type": "практика",
+            "teacher": "Верясов М.В., Кудряшов И.И, Черкасов Д.С.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-10-02": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Технические каналы утечки информации", "topic": "Определение каналов утечки АРИ, циркулирующей в защищаемых помещениях", "type": "практика", "teacher": "Воловоденко Б.Н., ДСИ (Лепехин В.В.), Рыженко С.В.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Технические каналы утечки информации",
+            "topic": "Определение каналов утечки АРИ, циркулирующей в защищаемых помещениях",
+            "type": "практика",
+            "teacher": "Воловоденко Б.Н., ДСИ (Лепехин В.В.), Рыженко С.В.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-10-09": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Защита информации от НСД", "topic": "Тема 3. Организация выполнения работ по защите информации от НСД", "type": "лекция", "teacher": "Фролов А.В., Рулёв А.С., Ерохин И.А.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Тема 3. Организация выполнения работ по защите информации от НСД",
+            "type": "лекция",
+            "teacher": "Фролов А.В., Рулёв А.С., Ерохин И.А.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-10-14": [
-          { "num": 1, "time": "10:00-11:50", "subject": "Аттестация объекта информатизации по требованиям безопасности информации", "topic": "Подготовка и проведение анализа защищенности ЛВС организации", "type": "практика", "teacher": "Белёвцев А.В., Шамшин В.С., Демьянов Д.И.", "room": "БК - ЦБИ" },
-          { "num": 2, "time": "12:00-14:00", "subject": "Защита информации от НСД", "topic": "Тема 4. Методология проведения информационного обследования информационных (автоматизированных) систем в части вопросов защиты информации", "type": "практика", "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-11:50",
+            "subject": "Аттестация объекта информатизации по требованиям безопасности информации",
+            "topic": "Подготовка и проведение анализа защищенности ЛВС организации",
+            "type": "практика",
+            "teacher": "Белёвцев А.В., Шамшин В.С., Демьянов Д.И.",
+            "room": "БК - ЦБИ"
+          },
+          {
+            "num": 2,
+            "time": "12:00-14:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Тема 4. Методология проведения информационного обследования информационных (автоматизированных) систем в части вопросов защиты информации",
+            "type": "практика",
+            "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-10-16": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Технические каналы утечки информации", "topic": "Демонстрация лазерного канала утечки информации", "type": "практика", "teacher": "Суходольский Г.А., ДСИ (Лубов Н.В.), Рыженко С.В.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Технические каналы утечки информации",
+            "topic": "Демонстрация лазерного канала утечки информации",
+            "type": "практика",
+            "teacher": "Суходольский Г.А., ДСИ (Лубов Н.В.), Рыженко С.В.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-10-23": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Защита информации от НСД", "topic": "Формирование требований к защите информации в информационной системе", "type": "практика", "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Формирование требований к защите информации в информационной системе",
+            "type": "практика",
+            "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-10-28": [
-          { "num": 1, "time": "10:00-11:50", "subject": "Аттестация объекта информатизации по требованиям безопасности информации", "topic": "Анализ уязвимостей информационной системы и принятие мер защиты информации по их устранению. Документирование.", "type": "практика", "teacher": "Шамшин В.С., Демьянов Д.И., Белёвцев А.В.", "room": "БК - ЦБИ" },
-          { "num": 2, "time": "12:00-14:00", "subject": "Защита информации от НСД", "topic": "Применение автоматизированных средств при проведении обследования (Агент инвентаризации, Ревизор 1ХР, Ревизор 2ХР)", "type": "практика", "teacher": "Осипов С.П", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-11:50",
+            "subject": "Аттестация объекта информатизации по требованиям безопасности информации",
+            "topic": "Анализ уязвимостей информационной системы и принятие мер защиты информации по их устранению. Документирование.",
+            "type": "практика",
+            "teacher": "Шамшин В.С., Демьянов Д.И., Белёвцев А.В.",
+            "room": "БК - ЦБИ"
+          },
+          {
+            "num": 2,
+            "time": "12:00-14:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Применение автоматизированных средств при проведении обследования (Агент инвентаризации, Ревизор 1ХР, Ревизор 2ХР)",
+            "type": "практика",
+            "teacher": "Осипов С.П",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-10-30": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Технические каналы утечки информации", "topic": "Тема 3. Каналы утечки АРИ, образованные ВТСС", "type": "лекция", "teacher": "Воловоденко Б.Н., ДСИ (Панков В.В.), Рыженко С.В.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Технические каналы утечки информации",
+            "topic": "Тема 3. Каналы утечки АРИ, образованные ВТСС",
+            "type": "лекция",
+            "teacher": "Воловоденко Б.Н., ДСИ (Панков В.В.), Рыженко С.В.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-11-06": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Защита информации от НСД", "topic": "Применение автоматизированных средств при проведении обследования (ФИКС, Terrier)", "type": "практика", "teacher": "Осипов С.П", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Применение автоматизированных средств при проведении обследования (ФИКС, Terrier)",
+            "type": "практика",
+            "teacher": "Осипов С.П",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-11-11": [
-          { "num": 1, "time": "10:00-11:50", "subject": "Аттестация объекта информатизации по требованиям безопасности информации", "topic": "Применение средства анализа уязвимостей RedCheck", "type": "практика", "teacher": "Шамшин В.С., Демьянов Д.И., Белёвцев А.В.", "room": "БК - ЦБИ" },
-          { "num": 2, "time": "12:00-14:00", "subject": "Защита информации от НСД", "topic": "Тема 5. Разработка систем защиты информации информационных систем. Разработка решений по реализации мер защиты информации", "type": "практика", "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-11:50",
+            "subject": "Аттестация объекта информатизации по требованиям безопасности информации",
+            "topic": "Применение средства анализа уязвимостей RedCheck",
+            "type": "практика",
+            "teacher": "Шамшин В.С., Демьянов Д.И., Белёвцев А.В.",
+            "room": "БК - ЦБИ"
+          },
+          {
+            "num": 2,
+            "time": "12:00-14:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Тема 5. Разработка систем защиты информации информационных систем. Разработка решений по реализации мер защиты информации",
+            "type": "практика",
+            "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-11-13": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Технические каналы утечки информации", "topic": "Демонстрация каналов утечки, образованных ВТСС", "type": "практика", "teacher": "Воловоденко Б.Н., ДСИ (Юдин Г.В.), ДСИ (Смирнов М.Е.)", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Технические каналы утечки информации",
+            "topic": "Демонстрация каналов утечки, образованных ВТСС",
+            "type": "практика",
+            "teacher": "Воловоденко Б.Н., ДСИ (Юдин Г.В.), ДСИ (Смирнов М.Е.)",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-11-20": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Защита информации от НСД", "topic": "Формирование набора мер защиты информации для информационных систем.", "type": "практика", "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Формирование набора мер защиты информации для информационных систем.",
+            "type": "практика",
+            "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-11-25": [
-          { "num": 1, "time": "10:00-11:50", "subject": "Аттестация объекта информатизации по требованиям безопасности информации", "topic": "Проведение тестирования на проникновение", "type": "практика", "teacher": "Шамшин В.С., Белёвцев А.В., Ермолаев Д.Н.", "room": "БК - ЦБИ" },
-          { "num": 2, "time": "12:00-14:00", "subject": "Защита информации от НСД", "topic": "Разработка типовых документов по защите информации", "type": "практика", "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-11:50",
+            "subject": "Аттестация объекта информатизации по требованиям безопасности информации",
+            "topic": "Проведение тестирования на проникновение",
+            "type": "практика",
+            "teacher": "Шамшин В.С., Белёвцев А.В., Ермолаев Д.Н.",
+            "room": "БК - ЦБИ"
+          },
+          {
+            "num": 2,
+            "time": "12:00-14:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Разработка типовых документов по защите информации",
+            "type": "практика",
+            "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-11-27": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Технические каналы утечки информации", "topic": "Тема 4. Технические каналы утечки информации, обрабатываемой ОТСС", "type": "лекция", "teacher": "Воловоденко Б.Н., ДСИ (Попов А.С.), Рыженко С.В.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Технические каналы утечки информации",
+            "topic": "Тема 4. Технические каналы утечки информации, обрабатываемой ОТСС",
+            "type": "лекция",
+            "teacher": "Воловоденко Б.Н., ДСИ (Попов А.С.), Рыженко С.В.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-12-04": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Защита информации от НСД", "topic": "Выбор средств защиты информации для реализации мер ЗИ. Разработка схем решений по защите информации", "type": "практика", "teacher": "Блинов А.А., Голубев Д.Е., Снитенко Д.А.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Выбор средств защиты информации для реализации мер ЗИ. Разработка схем решений по защите информации",
+            "type": "практика",
+            "teacher": "Блинов А.А., Голубев Д.Е., Снитенко Д.А.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-12-09": [
-          { "num": 1, "time": "10:00-11:50", "subject": "Аттестация объекта информатизации по требованиям безопасности информации", "topic": "Применение ОС Kali Linux при проведении тестирования на проникновение", "type": "практика", "teacher": "Шамшин В.С., Ермолаев Д.Н.", "room": "БК - ЦБИ" },
-          { "num": 2, "time": "12:00-14:00", "subject": "Защита информации от НСД", "topic": "Тема 6. Внедрение системы защиты информации информационной системы", "type": "лекция", "teacher": "Блинов А.А. ДСП (50), Голубев Д.А., Снитенко Д.А.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-11:50",
+            "subject": "Аттестация объекта информатизации по требованиям безопасности информации",
+            "topic": "Применение ОС Kali Linux при проведении тестирования на проникновение",
+            "type": "практика",
+            "teacher": "Шамшин В.С., Ермолаев Д.Н.",
+            "room": "БК - ЦБИ"
+          },
+          {
+            "num": 2,
+            "time": "12:00-14:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Тема 6. Внедрение системы защиты информации информационной системы",
+            "type": "лекция",
+            "teacher": "Блинов А.А. ДСП (50), Голубев Д.А., Снитенко Д.А.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-12-11": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Технические каналы утечки информации", "topic": "Технические каналы утечки информации, обрабатываемой ОТСС", "type": "практика", "teacher": "ДСИ (Лепехин В.В.), Рыженко С.В., Воловоденко Б.Н.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Технические каналы утечки информации",
+            "topic": "Технические каналы утечки информации, обрабатываемой ОТСС",
+            "type": "практика",
+            "teacher": "ДСИ (Лепехин В.В.), Рыженко С.В., Воловоденко Б.Н.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-12-18": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Защита информации от НСД", "topic": "Разработка программы и методики предварительных испытаний системы защиты информации", "type": "практика", "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Разработка программы и методики предварительных испытаний системы защиты информации",
+            "type": "практика",
+            "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-12-23": [
-          { "num": 1, "time": "10:00-11:50", "subject": "Аттестация объекта информатизации по требованиям безопасности информации", "topic": "Разработка документов при проведении контроля аттестованных информационных систем", "type": "практика", "teacher": "Верясов Н.В., Демьянов Д.И., Грасмик А.В.", "room": "БК - ЦБИ" },
-          { "num": 2, "time": "12:00-14:00", "subject": "Защита информации от НСД", "topic": "Разработка программы и методики приемочных испытаний системы защиты информации", "type": "практика", "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-11:50",
+            "subject": "Аттестация объекта информатизации по требованиям безопасности информации",
+            "topic": "Разработка документов при проведении контроля аттестованных информационных систем",
+            "type": "практика",
+            "teacher": "Верясов Н.В., Демьянов Д.И., Грасмик А.В.",
+            "room": "БК - ЦБИ"
+          },
+          {
+            "num": 2,
+            "time": "12:00-14:00",
+            "subject": "Защита информации от НСД",
+            "topic": "Разработка программы и методики приемочных испытаний системы защиты информации",
+            "type": "практика",
+            "teacher": "Захаров В.Г. ДСП (50), Костицын Н.А.",
+            "room": "БК - ЦБИ"
+          }
         ],
         "2026-12-25": [
-          { "num": 1, "time": "10:00-13:00", "subject": "Технические каналы утечки информации", "topic": "Демонстрация каналов утечки ПЭМИН", "type": "практика", "teacher": "ДСИ (Смирнов М.Е.), ДСИ (Юдин Г.В.), Рыженко С.В.", "room": "БК - ЦБИ" }
+          {
+            "num": 1,
+            "time": "10:00-13:00",
+            "subject": "Технические каналы утечки информации",
+            "topic": "Демонстрация каналов утечки ПЭМИН",
+            "type": "практика",
+            "teacher": "ДСИ (Смирнов М.Е.), ДСИ (Юдин Г.В.), Рыженко С.В.",
+            "room": "БК - ЦБИ"
+          }
         ]
       }
+    }
+  },
+  "version": "3.0",
+  "updatedAt": "2026-11-23",
+  "timeZone": "Europe/Moscow",
+  "sources": {
+    "mk-nov": {
+      "title": "МК1 · 23–28 ноября",
+      "description": "Два фото таблицы. Группа подтверждена пользователем. Суббота — продолжение таблицы; сокращения предметов сохранены.",
+      "date": "2026-11-23"
+    },
+    "ibo-nov": {
+      "title": "ИБО-24 · сообщения бота",
+      "description": "Точные даты: 14, 16, 17, 18, 20, 21 и 23 ноября 2026. Преподаватели, если совпали предмет, тип и время, сохранены из предыдущего расписания.",
+      "date": "2026-11-23"
+    },
+    "cbi": {
+      "title": "ЦБИ · осень 2026",
+      "description": "Расписание 3 курса из предыдущего проекта, сентябрь–декабрь. Сохранены темы, преподаватели и аудитории. Занятие 20 ноября уточнено по сообщению бота.",
+      "date": "2026-11-23"
+    },
+    "legacy": {
+      "title": "Предыдущее расписание",
+      "description": "История октября и двухнедельный цикл ИБО-24 сохранены. Цикл служит основой; точная дата имеет приоритет.",
+      "date": "2026-10-18"
     }
   }
 }
 </script>
-<style>
-:root{
-  --bg:#07090f;--text:#eef2ff;--text-2:rgba(226,232,255,.68);--text-3:rgba(226,232,255,.44);
-  --card-1:rgba(255,255,255,.085);--card-2:rgba(255,255,255,.03);--card-solid:#11152a;
-  --stroke:rgba(255,255,255,.10);--stroke-2:rgba(255,255,255,.18);--hi:rgba(255,255,255,.08);
-  --shadow:0 8px 28px -14px rgba(0,0,0,.8);
-  --accent:#7c5cff;--accent-2:#22d3ee;--glow-2:#22d3ee;--grid:rgba(255,255,255,.04);
-  --g1:rgba(91,61,255,.55);--g2:rgba(0,170,255,.38);--g3:rgba(255,61,154,.26);
-  --lec:#34d399;--lec-rgb:52,211,153;--prac:#fbbf24;--prac-rgb:251,191,36;
-  --lab:#a78bfa;--lab-rgb:167,139,250;--other:#60a5fa;--other-rgb:96,165,250;
-  --r-lg:22px;--r-md:16px;
-  --safe-top:0px;--safe-bottom:0px;
-  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  --mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,"Roboto Mono",Menlo,monospace;
-}
-:root[data-theme="light"]{
-  --bg:#eef1fb;--text:#0d1226;--text-2:rgba(13,18,38,.68);--text-3:rgba(13,18,38,.45);
-  --card-1:rgba(255,255,255,.72);--card-2:rgba(255,255,255,.38);--card-solid:#ffffff;--accent-2:#0e7490;
-  --stroke:rgba(20,30,80,.10);--stroke-2:rgba(20,30,80,.18);--hi:rgba(255,255,255,.7);
-  --shadow:0 8px 26px -16px rgba(40,50,120,.45);--grid:rgba(20,30,90,.05);
-  --g1:rgba(91,61,255,.30);--g2:rgba(0,170,255,.26);--g3:rgba(255,61,154,.18);
-  --lec:#047857;--lec-rgb:4,120,87;--prac:#b45309;--prac-rgb:180,83,9;
-  --lab:#7c3aed;--lab-rgb:124,58,237;--other:#2563eb;--other-rgb:37,99,235;
-}
-@supports (padding:env(safe-area-inset-top,0px)){:root{--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}}
-@supports (padding:max(0px,1px)){:root{
-  --safe-top:calc(max(env(safe-area-inset-top,0px),var(--tg-sa-top,0px)) + var(--tg-top,0px));
-  --safe-bottom:calc(max(env(safe-area-inset-bottom,0px),var(--tg-sa-bottom,0px)) + var(--tg-bottom,0px))}}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%}
-body{background:var(--bg);color:var(--text);font:15px/1.4 var(--font);overflow:hidden;
-  -webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none}
-button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
-
-/* Фон: статичные градиенты и сетка, без blur-фильтров (дёшево для GPU) */
-.bg{position:fixed;top:0;right:0;bottom:0;left:0;z-index:0;pointer-events:none;
-  background:radial-gradient(circle at 0 0,var(--g1),transparent 55%),
-             radial-gradient(circle at 100% 100%,var(--g2),transparent 55%),
-             radial-gradient(circle at 85% 45%,var(--g3),transparent 40%)}
-.bg:before{content:"";position:absolute;top:-10%;left:-10%;width:120%;height:120%;will-change:transform;
-  background:radial-gradient(circle at 30% 30%,var(--g1),transparent 32%),radial-gradient(circle at 70% 75%,var(--g2),transparent 30%);
-  opacity:.55;animation:aurora 26s ease-in-out infinite alternate}
-@keyframes aurora{to{transform:translate3d(6%,-5%,0) scale(1.08)}}
-.paused .bg:before,.paused .live:before{animation-play-state:paused}
-.bg:after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;
-  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
-  background-size:32px 32px;
-  -webkit-mask-image:radial-gradient(ellipse at 50% 25%,#000 25%,transparent 75%);
-  mask-image:radial-gradient(ellipse at 50% 25%,#000 25%,transparent 75%)}
-
-/* «Стекло» без backdrop-filter: полупрозрачный градиент, тонкая рамка и блик сверху */
-.glass{background:linear-gradient(150deg,var(--card-1),var(--card-2));border:1px solid var(--stroke);
-  box-shadow:var(--shadow),inset 0 1px 0 var(--hi)}
-
-.screen{position:fixed;top:0;right:0;bottom:0;left:0;z-index:1;display:flex;flex-direction:column;
-  padding:14px 16px 0;padding-top:calc(var(--safe-top) + 14px);transition:opacity .25s ease,visibility 0s}
-.screen.hidden{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s ease,visibility 0s .25s}
-
-/* Выбор группы */
-.picker{overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:24px;padding-bottom:calc(var(--safe-bottom) + 24px)}
-.brand{display:flex;align-items:center;margin:8px 0 26px}
-.logo{margin-right:10px}
-.logo{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;
-  background:linear-gradient(135deg,var(--accent),var(--glow-2));box-shadow:0 0 22px -4px var(--accent)}
-.logo svg{width:22px;height:22px}
-.brand b{font-size:17px}
-.brand small{display:block;color:var(--text-3);font:11px var(--mono);letter-spacing:.8px}
-.hero h1{font-size:31px;line-height:1.08;margin:0 0 8px;font-weight:800;letter-spacing:-.5px}
-.hero h1 span{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p{margin:0 0 22px;color:var(--text-2)}
-.groups{display:grid;gap:12px}
-.group-card{position:relative;display:flex;align-items:center;padding:16px;border-radius:var(--r-lg);overflow:hidden;
-  transition:transform .15s ease;animation:rise .35s ease backwards}
-.group-card:active{transform:scale(.98)}
-.group-card:after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:50%;pointer-events:none;
-  background:linear-gradient(105deg,transparent,rgba(255,255,255,.14),transparent);animation:sheen 1.1s .4s ease-out backwards}
-@keyframes sheen{from{transform:translateX(0)}to{transform:translateX(420%)}}
-.group-card .badge{margin-right:14px}.group-card .chev{margin-left:14px}
-.group-card .badge{flex:none;width:58px;height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;
-  font:700 13px var(--mono);background:linear-gradient(135deg,rgba(124,92,255,.35),rgba(34,211,238,.25));border:1px solid var(--stroke-2)}
-.group-card .meta{flex:1;min-width:0}
-.group-card .meta b{display:block;font-size:18px}
-.group-card .meta span{display:block;color:var(--text-2);font-size:13px;margin-top:2px}
-.group-card .meta em{display:inline-block;margin-top:8px;font:normal 11px var(--mono);color:var(--accent-2);
-  padding:3px 8px;border-radius:99px;background:rgba(34,211,238,.10);border:1px solid rgba(34,211,238,.3)}
-.group-card .chev{color:var(--text-3);flex:none}
-.group-card.current{border-color:rgba(124,92,255,.65)}
-.ver{margin-top:22px;text-align:center;font:11px var(--mono);color:var(--text-3)}
-@keyframes rise{from{opacity:0;transform:translateY(10px)}}
-.boot .screen{transition:none!important}
-.lite .bg:before{animation:none;will-change:auto}
-
-/* Расписание */
-.topbar{display:flex;align-items:center}
-.chip{display:flex;align-items:center;padding:6px 12px 6px 6px;border-radius:99px;min-width:0}
-.chip .dot{margin-right:8px}.chip svg{margin-left:8px}
-.chip .dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;
-  background:linear-gradient(135deg,var(--accent),var(--glow-2));font-size:11px;font-weight:800;color:#fff}
-.chip b{font-size:15px;white-space:nowrap}
-.chip svg{opacity:.6;flex:none}
-.spacer{flex:1}
-.icon-btn{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;transition:transform .15s}
-.icon-btn:active{transform:scale(.9)}
-.icon-btn svg{width:19px;height:19px}
-.week-head{display:flex;align-items:center;margin:16px 0 12px}
-.week-head>*+*{margin-left:8px}
-.week-head .title{flex:1;min-width:0}
-.week-head .title b{display:block;font-size:22px;font-weight:800;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.week-head .title small{display:block;font:11px var(--mono);color:var(--text-3);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.today-btn{padding:8px 12px;border-radius:99px;font-size:13px;font-weight:700;color:var(--accent-2)}
-.today-btn[hidden]{display:none}
-:root[data-theme="light"] .today-btn{color:var(--accent)}
-
-.week-strip{position:relative;display:flex;padding:6px;border-radius:20px}
-.day-btn+.day-btn{margin-left:4px}
-.day-btn{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0 9px;border-radius:14px;text-align:center}
-.day-btn .dw{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase}
-.day-btn .dn{font:700 17px var(--mono);margin-top:2px}
-.day-btn .pips{display:flex;height:4px;margin-top:4px}
-.pips i+i{margin-left:2px}
-.day-btn .pips i{width:4px;height:4px;border-radius:50%;background:var(--text-3)}
-.pips .lec{background:var(--lec)!important}.pips .prac{background:var(--prac)!important}
-.pips .lab{background:var(--lab)!important}.pips .other{background:var(--other)!important}
-.day-btn.is-today .dn{color:var(--accent-2)}
-.day-btn.is-today:before{content:"";position:absolute;top:5px;right:50%;margin-right:-16px;width:5px;height:5px;border-radius:50%;background:var(--accent-2);animation:pulse 2s ease-in-out 3}
-@keyframes pulse{50%{opacity:.3}}
-.day-btn.active .dw,.day-btn.active .dn{color:#fff}
-.day-btn.active .pips i{background:rgba(255,255,255,.85)!important}
-.indicator{position:absolute;z-index:0;top:6px;bottom:6px;left:0;width:0;border-radius:14px;
-  background:linear-gradient(135deg,var(--accent),#4f7bff 60%,var(--glow-2));
-  box-shadow:0 6px 18px -6px var(--accent),inset 0 1px 0 rgba(255,255,255,.35);
-  transition:transform .35s cubic-bezier(.3,1.25,.5,1)}
-
-.legend{display:flex;flex-wrap:wrap;margin:12px 4px 0;font-size:12px;color:var(--text-2)}
-.legend span{display:flex;align-items:center;margin:0 14px 4px 0}
-.legend i{width:8px;height:8px;border-radius:50%;margin-right:6px}
-
-.viewport{position:relative;flex:1;margin:0 -16px;overflow:hidden;touch-action:pan-y}
-.day-pane{position:absolute;top:0;right:0;bottom:0;left:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain;padding:12px 16px 28px;padding-bottom:calc(var(--safe-bottom) + 28px)}
-.in-r{animation:inR .3s ease-out backwards}.in-l{animation:inL .3s ease-out backwards}
-.out-l{animation:outL .22s ease-in both}.out-r{animation:outR .22s ease-in both}
-@keyframes inR{from{transform:translateX(30%);opacity:0}to{transform:none;opacity:1}}
-@keyframes inL{from{transform:translateX(-30%);opacity:0}to{transform:none;opacity:1}}
-@keyframes outL{to{transform:translateX(-30%);opacity:0}}
-@keyframes outR{to{transform:translateX(30%);opacity:0}}
-
-.day-summary{display:flex;align-items:baseline;justify-content:space-between;margin:4px 4px 12px;color:var(--text-2);font-size:13px}
-.day-summary .mono{margin-left:8px}
-.day-summary b{color:var(--text);font-size:15px}
-.day-summary .mono{font:12px var(--mono);white-space:nowrap}
-.lessons{display:grid;gap:10px}
-
-.lesson{--c:var(--other);--c-rgb:var(--other-rgb);position:relative;display:flex;flex-wrap:wrap;width:100%;
-  padding:14px 14px 14px 12px;border-radius:var(--r-lg);overflow:hidden;transition:transform .12s ease}
-.lesson.lec{--c:var(--lec);--c-rgb:var(--lec-rgb)}.lesson.prac{--c:var(--prac);--c-rgb:var(--prac-rgb)}
-.lesson.lab{--c:var(--lab);--c-rgb:var(--lab-rgb)}
-.lesson:active{transform:scale(.985)}
-.stagger .lesson,.stagger .empty{animation:rise .35s ease-out backwards}
-.stagger .lesson:nth-child(2){animation-delay:.04s}.stagger .lesson:nth-child(3){animation-delay:.08s}
-.stagger .lesson:nth-child(4){animation-delay:.12s}.stagger .lesson:nth-child(5){animation-delay:.16s}
-.stagger .lesson:nth-child(n+6){animation-delay:.2s}
-.lesson:before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--c);box-shadow:0 0 10px var(--c)}
-.lesson:after{content:"";position:absolute;right:0;top:0;width:140px;height:140px;pointer-events:none;
-  background:radial-gradient(circle at 100% 0,rgba(var(--c-rgb),.16),transparent 70%)}
-.lesson .time{width:56px;flex:none;display:flex;flex-direction:column;align-items:center;padding-top:2px;font-family:var(--mono)}
-.lesson .time .n{font-size:11px;color:var(--text-3)}
-.lesson .time .s{font-size:15px;font-weight:700;margin-top:2px}
-.lesson .time .e{font-size:12px;color:var(--text-3)}
-.lesson .body{flex:1;min-width:0;padding-left:12px}
-.tag{display:inline-flex;align-items:center;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--c)}
-.tag:before{content:"";width:6px;height:6px;margin-right:6px;border-radius:50%;background:var(--c)}
-.lesson h3{margin:4px 0 6px;font-size:15.5px;line-height:1.28;font-weight:700;
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.info{display:flex;flex-wrap:wrap;color:var(--text-2);font-size:12.5px}
-.info span{display:inline-flex;align-items:center;margin-right:12px}
-.info svg{width:13px;height:13px;margin-right:4px;opacity:.75;flex:none}
-.lesson.past{opacity:.5}
-.lesson.now{border-color:rgba(var(--c-rgb),.6);box-shadow:var(--shadow),0 0 26px -8px rgba(var(--c-rgb),.7)}
-.live{display:inline-block;margin-left:8px;font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
-  color:#0b1020;background:var(--c);padding:2px 7px 2px 16px;border-radius:99px;vertical-align:1px;position:relative}
-.live:before{content:"";position:absolute;left:6px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:currentColor;animation:pulse 1.4s ease-in-out infinite}
-:root[data-theme="light"] .live{color:#fff}
-.progress{width:100%;height:4px;border-radius:4px;background:var(--stroke);overflow:hidden;margin-top:12px}
-.progress i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,rgba(var(--c-rgb),.55),var(--c))}
-.progress-label{width:100%;display:flex;justify-content:space-between;font:11px var(--mono);color:var(--text-3);margin-top:6px}
-.gap{display:flex;align-items:center;color:var(--text-3);font:12px var(--mono);padding:0 8px}
-.gap:before,.gap:after{content:"";flex:1;height:1px;margin:0 10px;background:var(--stroke-2);opacity:.6}
-.empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:40px 20px;border-radius:var(--r-lg)}
-.empty .ico{font-size:42px;margin-bottom:10px}
-.empty b{font-size:17px}
-.empty p{margin:6px 0 0;color:var(--text-2);font-size:13.5px;max-width:280px}
-.next-hint{margin:12px 4px 0;font-size:12.5px;color:var(--text-2);text-align:center}
-.next-hint b{color:var(--accent-2)}
-
-/* Нижняя панель */
-.overlay{position:fixed;top:0;right:0;bottom:0;left:0;z-index:10;background:rgba(3,5,12,.6);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
-.overlay.open{opacity:1;visibility:visible}
-.sheet{--c:var(--other);--c-rgb:var(--other-rgb);position:fixed;left:0;right:0;bottom:0;z-index:11;max-height:88%;overflow-y:auto;
-  -webkit-overflow-scrolling:touch;padding:10px 18px 22px;padding-bottom:calc(var(--safe-bottom) + 22px);border-radius:26px 26px 0 0;
-  background:var(--card-solid);border-top:1px solid var(--stroke-2);box-shadow:0 -10px 40px -10px rgba(0,0,0,.6);
-  transform:translateY(105%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.9,.2,1),visibility 0s .32s}
-.sheet.open{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.9,.2,1),visibility 0s}
-.sheet.dragging{transition:none}
-.sheet.lec{--c:var(--lec);--c-rgb:var(--lec-rgb)}.sheet.prac{--c:var(--prac);--c-rgb:var(--prac-rgb)}.sheet.lab{--c:var(--lab);--c-rgb:var(--lab-rgb)}
-.sheet:before{content:"";position:absolute;left:0;right:0;top:0;height:120px;pointer-events:none;
-  background:radial-gradient(ellipse at 50% 0,rgba(var(--c-rgb),.22),transparent 70%)}
-.grabber{width:42px;height:5px;border-radius:5px;background:var(--stroke-2);margin:2px auto 16px}
-.sheet .tag{padding:5px 11px;border-radius:99px;font-size:12px;background:rgba(var(--c-rgb),.14);border:1px solid rgba(var(--c-rgb),.35)}
-.sheet h2{position:relative;margin:12px 0 4px;font-size:21px;line-height:1.2;font-weight:800}
-.sheet .topic{position:relative;margin:0 0 4px;color:var(--text-2);font-size:14px}
-.rows{position:relative;display:grid;gap:8px;margin-top:16px}
-.row{display:flex;align-items:center;padding:12px 14px;border-radius:var(--r-md);background:var(--card-2);border:1px solid var(--stroke)}
-.row .ri{width:36px;height:36px;margin-right:12px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none;
-  background:rgba(var(--c-rgb),.15);color:var(--c)}
-.row .ri svg{width:18px;height:18px}
-.row small{display:block;font-size:11.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
-.row b{display:block;font-size:15px;word-break:break-word}
-.row.muted b{color:var(--text-3);font-weight:500}
-.sheet-actions{position:relative;display:flex;margin-top:16px}
-.sheet-actions .btn+.btn{margin-left:10px}
-.btn{flex:1;display:flex;align-items:center;justify-content:center;height:50px;border-radius:var(--r-md);font-weight:800;font-size:15px;text-align:center}
-.btn svg{width:18px;height:18px;margin-right:8px}
-.btn.primary{color:#fff;background:linear-gradient(135deg,var(--accent),var(--glow-2))}
-.btn.ghost{background:var(--card-1);border:1px solid var(--stroke)}
-
-#err{display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:99;padding:12px 14px;border-radius:14px;
-  background:#3b0d18;color:#ffd5dc;font:12px/1.4 var(--mono);white-space:pre-wrap;-webkit-user-select:text;user-select:text}
-
-@media (max-width:400px){.week-head .title b{font-size:19px}}
-@media (max-width:350px){.day-btn .dn{font-size:15px}.lesson .time{width:48px}.hero h1{font-size:26px}.week-head .title b{font-size:17px}.today-btn{padding:8px 9px}}
-@media (min-width:640px){.screen,.sheet{max-width:560px;margin:0 auto}}
-@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
-</style>
-</head>
-<body>
-<div id="err"></div>
-<script>
-// Если что-то сломается, показываем ошибку на экране, а не пустое окно
-window.onerror = function (msg, src, line) {
-  var box = document.getElementById("err");
-  if (box) { box.style.display = "block"; box.textContent = "Ошибка: " + msg + (line ? " (строка " + line + ")" : ""); }
-  if (window.__tgReadySent) return;
-  try { // всё равно убираем заставку Telegram, чтобы ошибку было видно
-    var tgHash = /tgWebAppVersion=/.test(location.hash);
-    try { tgHash = tgHash || /tgWebAppVersion/.test(sessionStorage.getItem("tgParams") || ""); } catch (e) {}
-    if (window.TelegramWebviewProxy) { window.__tgReadySent = true; window.TelegramWebviewProxy.postEvent("web_app_ready", '""'); }
-    else if (tgHash && window.parent && window.parent !== window) {
-      window.__tgReadySent = true;
-      window.parent.postMessage('{"eventType":"web_app_ready","eventData":""}', "*");
-    }
-  } catch (e) {}
-};
-</script>
-<div class="bg" aria-hidden="true"></div>
-
-<section class="screen picker" id="picker">
-  <div class="brand">
-    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M8 14h3M8 17h6"/></svg></div>
-    <div><b>Расписание</b><small>TIMETABLE · MINI APP</small></div>
-  </div>
-  <div class="hero">
-    <h1>Выбери свою <span>группу</span></h1>
-    <p>Приложение запомнит выбор, сменить группу можно в любой момент.</p>
-  </div>
-  <div class="groups" id="groupList"></div>
-  <div class="ver" id="ver"></div>
-</section>
-
-<section class="screen hidden" id="schedule">
-  <div class="topbar">
-    <button class="chip glass" id="groupChip" aria-label="Сменить группу">
-      <span class="dot" id="chipDot"></span><b id="chipName"></b>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-    </button>
-    <div class="spacer"></div>
-    <button class="icon-btn glass" id="themeBtn" aria-label="Сменить тему"></button>
-  </div>
-  <div class="week-head">
-    <button class="icon-btn glass" id="prevWeek" aria-label="Предыдущая неделя"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
-    <div class="title"><b id="monthLabel"></b><small id="weekLabel"></small></div>
-    <button class="today-btn glass" id="todayBtn">Сегодня</button>
-    <button class="icon-btn glass" id="nextWeek" aria-label="Следующая неделя"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
-  </div>
-  <div class="week-strip glass" id="weekStrip"><div class="indicator" id="indicator"></div></div>
-  <div class="legend">
-    <span><i style="background:var(--lec)"></i>Лекция</span>
-    <span><i style="background:var(--prac)"></i>Практика</span>
-    <span><i style="background:var(--lab)"></i>Лабораторная</span>
-  </div>
-  <div class="viewport" id="viewport"></div>
-</section>
-
-<div class="overlay" id="overlay"></div>
-<div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
-
-<script>
-(function () {
-  "use strict";
-  var APP_VERSION = "2.4";
-
-  /* ── Мост к Telegram без внешнего SDK ──
-     Тот же протокол, что в официальном telegram-web-app.js: события уходят через
-     TelegramWebviewProxy (iOS, Android, Desktop) или postMessage (web.telegram.org),
-     ответы приходят в Telegram.WebView.receiveEvent. Так приложению не нужен telegram.org. */
-  var TG = (function () {
+  <script>window.ScheduleTelegram = (function () {
     var params = {};
     var dec = function (x) { try { return decodeURIComponent(x.replace(/\+/g, "%20")); } catch (e) { return x; } };
     try {
@@ -655,507 +1729,329 @@ window.onerror = function (msg, src, line) {
     };
   })();
 
-  var haptic = {
-    tap: function () { if (TG.available() && TG.atLeast("6.1")) TG.post("web_app_trigger_haptic_feedback", { type: "impact", impact_style: "light" }); },
-    select: function () { if (TG.available() && TG.atLeast("6.1")) TG.post("web_app_trigger_haptic_feedback", { type: "selection_change" }); },
-  };
-
-  /* ── Данные ── */
-  var GROUPS = {}, dataError = "";
-  try { GROUPS = JSON.parse(document.getElementById("schedule-data").textContent).groups || {}; }
-  catch (e) { dataError = String(e && e.message || e); }
-  var WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-  var DW_SHORT = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-  var DW_FULL = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
-  var MONTHS = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-  var MONTHS_GEN = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
-  var has = function (o, k) { return !!o && Object.prototype.hasOwnProperty.call(o, k); };
-
-  var store = {
-    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
-    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
-  };
-
-  /* ── Даты ── */
-  var pad = function (n) { return (n < 10 ? "0" : "") + n; };
-  var iso = function (d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
-  var startOfDay = function (d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
-  var addDays = function (d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); };
-  var dayIdx = function (d) { return (d.getDay() + 6) % 7; }; // 0 = понедельник
-  var mondayOf = function (d) { return addDays(d, -dayIdx(d)); };
-  var sameDay = function (a, b) { return iso(a) === iso(b); };
-  var today = function () { return startOfDay(new Date()); };
-  var splitTime = function (t) { return String(t || "").split(/[-–—]/).map(function (s) { return s.trim(); }); };
-  var toMin = function (t) { var p = String(t || "0:0").split(":"); return (+p[0] || 0) * 60 + (+p[1] || 0); };
-  var nowMin = function () { var n = new Date(); return n.getHours() * 60 + n.getMinutes(); };
-  var short3 = function (m) { return MONTHS_GEN[m].slice(0, 3); };
-  var plural = function (n, one, few, many) {
-    var a = n % 10, b = n % 100;
-    if (a === 1 && b !== 11) return one;
-    if (a >= 2 && a <= 4 && (b < 12 || b > 14)) return few;
-    return many;
-  };
-  var fmtDur = function (m) {
-    var h = Math.floor(m / 60), r = m % 60;
-    return (h ? h + " ч" : "") + (h && r ? " " : "") + (r || !h ? r + " мин" : "");
-  };
-  var esc = function (s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
-  };
-  var typeClass = function (t) {
-    var s = String(t || "").toLowerCase();
-    if (s.indexOf("лек") === 0) return "lec";
-    if (s.indexOf("прак") === 0 || s === "пз" || s.indexOf("сем") === 0) return "prac";
-    if (s.indexOf("лаб") === 0) return "lab";
-    return "other";
-  };
-
-  var parseIso = function (s) { var p = String(s || "").split("-"); return p.length === 3 ? new Date(+p[0], +p[1] - 1, +p[2]) : null; };
-
-  // Расписание по неделям на дату: из cycle берётся последнее, у которого start не позже даты
-  function cycleFor(g, date) {
-    var list = g.cycle ? [].concat(g.cycle) : [], key = iso(date), best = null, bestKey = "", i, d;
-    for (i = 0; i < list.length; i++) {
-      d = list[i] && list[i].weeks && list[i].weeks.length && parseIso(list[i].start);
-      if (d && iso(d) <= key && iso(d) >= bestKey) { best = list[i]; bestKey = iso(d); }
-    }
-    return best;
+</script>
+  <script>(function (root, factory) {
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.ScheduleCore = api;
+})(typeof window === 'undefined' ? globalThis : window, function () {
+  'use strict';
+  const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  const pad = n => String(n).padStart(2, '0');
+  const iso = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  const parse = key => { const [y, m, d] = key.split('-').map(Number); return new Date(y, m - 1, d, 12); };
+  const addDays = (date, n) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + n, 12);
+  const dayIndex = date => (date.getDay() + 6) % 7;
+  const monday = date => addDays(date, -dayIndex(date));
+  const minutes = time => { const [h, m] = time.split(':').map(Number); return h * 60 + m; };
+  const times = lesson => lesson.time.split(/[-–—]/).map(s => s.trim());
+  const has = (object, key) => Object.prototype.hasOwnProperty.call(object || {}, key);
+  function moscowNow(now = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Moscow', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(now);
+    const p = Object.fromEntries(parts.map(v => [v.type, v.value]));
+    return { key: `${p.year}-${p.month}-${p.day}`, minute: Number(p.hour) * 60 + Number(p.minute) };
   }
-
-  // Неделя с днём start — первая в weeks, дальше недели идут по очереди
-  function cycleWeek(c, date) {
-    var w = Math.round(Math.round((mondayOf(date) - mondayOf(parseIso(c.start))) / 864e5) / 7);
-    return c.weeks[w % c.weeks.length];
+  function cycleFor(group, key) {
+    return [...(group.cycle || [])].filter(c => c.start <= key).sort((a, b) => b.start.localeCompare(a.start))[0];
   }
-
-  // Пары на дату: точная дата — как есть; иначе неделя из cycle или weekly плюс extra на эту дату.
-  // День, которого нет в неделе, — «нет данных»; пустой список — «пар нет».
-  function getDay(name, date) {
-    var g = GROUPS[name] || {}, key = iso(date), wd = WEEKDAYS[dayIdx(date)], list = null, c, week;
-    if (has(g.dates, key)) list = g.dates[key] || [];
+  function classify(lesson) { return lesson.kind || (/ЦБИ/i.test(lesson.room || '') ? 'cbi' : 'main'); }
+  function getDay(data, name, key, filter = 'all') {
+    const group = data.groups[name] || {};
+    const date = parse(key);
+    let list = null, origin = 'none';
+    if (has(group.dates, key)) { list = group.dates[key]; origin = 'dated'; }
     else {
-      c = cycleFor(g, date);
-      week = c ? cycleWeek(c, date) : g.weekly;
-      if (week && has(week, wd)) list = week[wd] || [];
-      if (has(g.extra, key)) list = (list || []).concat(g.extra[key] || []);
+      const cycle = cycleFor(group, key);
+      const index = cycle ? Math.round((monday(date) - monday(parse(cycle.start))) / 604800000) % cycle.weeks.length : 0;
+      const week = cycle ? cycle.weeks[index] : group.weekly;
+      const wd = weekdays[dayIndex(date)];
+      if (has(week, wd)) { list = week[wd]; origin = cycle ? 'cycle' : 'weekly'; }
+      if (has(group.extra, key)) { list = [...(list || []), ...group.extra[key].map(l => ({ ...l, kind: 'cbi', source: 'cbi' }))]; }
     }
-    if (!list) return { lessons: [], status: "nodata" };
-    list = list.slice().sort(function (a, b) { return toMin(splitTime(a.time)[0]) - toMin(splitTime(b.time)[0]); });
-    return { lessons: list, status: list.length ? "ok" : "free" };
+    // Exact day lists already contain their CBI session. Never append it twice.
+    let lessons = (list || []).map(l => ({ ...l, kind: classify(l), source: l.source || (classify(l) === 'cbi' ? 'cbi' : 'legacy') }));
+    if (filter !== 'all') lessons = lessons.filter(l => l.kind === filter);
+    lessons.sort((a, b) => minutes(times(a)[0]) - minutes(times(b)[0]));
+    const cbiKnown = has(group.extra, key) || lessons.some(l => l.kind === 'cbi');
+    return { lessons, origin, status: lessons.length ? 'ok' : (filter === 'cbi' ? (cbiKnown ? 'free' : 'nodata') : list === null ? 'nodata' : list.length === 0 ? 'free' : 'filtered') };
   }
-
-  function groupStats(name) {
-    var g = GROUPS[name], c = cycleFor(g, today()), k = c ? c.weeks.length : 0, week = c ? c.weeks[0] : g.weekly;
-    if (k > 1) return k === 2 ? "чётные и нечётные недели" : "цикл из " + k + " " + plural(k, "недели", "недель", "недель");
-    if (week) {
-      var n = WEEKDAYS.reduce(function (s, d) { return s + (week[d] || []).length; }, 0);
-      return n + " " + plural(n, "пара", "пары", "пар") + " в неделю";
+  function conflicts(lessons) {
+    return lessons.filter((a, i) => lessons.some((b, j) => i !== j && minutes(times(a)[0]) < minutes(times(b)[1]) && minutes(times(b)[0]) < minutes(times(a)[1])));
+  }
+  function duration(lessons) { return lessons.reduce((sum, l) => { const [a, b] = times(l); return sum + minutes(b) - minutes(a); }, 0); }
+  function plural(n, one = 'пара', few = 'пары', many = 'пар') { return n % 10 === 1 && n % 100 !== 11 ? one : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? few : many; }
+  function ics(events, group, stamp = new Date()) {
+    const escape = s => String(s || '').replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
+    const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Schedule App//RU', 'CALSCALE:GREGORIAN'];
+    for (const { date, lesson } of events) {
+      const [start, end] = times(lesson);
+      const utc = time => new Date(`${date}T${time}:00+03:00`).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+      const uid = [...`${group}-${date}-${lesson.time}-${lesson.subject}`].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261);
+      lines.push('BEGIN:VEVENT', `UID:${uid}@schedule-app`, `DTSTAMP:${stamp.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z')}`, `DTSTART:${utc(start)}`, `DTEND:${utc(end)}`, `SUMMARY:${escape(lesson.subject)}`, `LOCATION:${escape(lesson.room)}`, `DESCRIPTION:${escape([group, lesson.type, lesson.teacher, lesson.topic].filter(Boolean).join('\n'))}`, 'END:VEVENT');
     }
-    var days = Object.keys(g.dates || {}).sort();
-    if (!days.length) return "нет данных";
-    var f = function (d) { var p = d.split("-"); return +p[2] + " " + short3(+p[1] - 1); };
-    return "по датам · " + f(days[0]) + " – " + f(days[days.length - 1]);
+    lines.push('END:VCALENDAR');
+    // RFC 5545: fold at UTF-8 byte boundaries, up to 75 octets per line.
+    return lines.map(line => {
+      let folded = '', length = 0;
+      for (const char of line) { const size = new TextEncoder().encode(char).length; if (length + size > 75) { folded += '\r\n '; length = 1; } folded += char; length += size; }
+      return folded;
+    }).join('\r\n') + '\r\n';
   }
-
-  var state = {
-    group: has(GROUPS, store.get("sched.group")) ? store.get("sched.group") : null,
-    date: today(),
-    theme: store.get("sched.theme") === "light" ? "light" : "dark",
-    sheetOpen: false,
-    lessons: [],
+  return { iso, parse, addDays, dayIndex, monday, minutes, times, moscowNow, cycleFor, classify, getDay, conflicts, duration, plural, ics };
+});
+</script>
+  <script>(function () {
+  'use strict';
+  const C = window.ScheduleCore;
+  const TG = window.ScheduleTelegram;
+  const data = JSON.parse(document.getElementById('schedule-data').textContent);
+  const $ = id => document.getElementById(id);
+  const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, s => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[s]));
+  const read = (key, fallback) => { try { return localStorage.getItem(key) || fallback; } catch (_) { return fallback; } };
+  const write = (key, value) => { try { localStorage.setItem(key, value); } catch (_) {} };
+  const dayNames = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const format = (key, options) => C.parse(key).toLocaleDateString('ru-RU', options);
+  const shortDate = key => format(key, { day:'numeric', month:'long' });
+  const fullDate = key => format(key, { weekday:'long', day:'numeric', month:'long' });
+  const capital = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const duration = n => `${Math.floor(n / 60)} ч${n % 60 ? ` ${n % 60} мин` : ''}`;
+  const paths = {
+    calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M16 3v4M8 3v4M3 11h18M8 15h2M14 15h2"/>',
+    groups:'<circle cx="9" cy="8" r="3"/><path d="M3 21v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6M21 21v-2a6 6 0 0 0-4-5"/>',
+    bookmark:'<path d="M6 4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17l-6-4-6 4z"/>',
+    layers:'<path d="m12 3 10 5-10 5L2 8zM2 12l10 5 10-5M2 16l10 5 10-5"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    chevronDown:'<path d="m6 9 6 6 6-6"/>', chevronLeft:'<path d="m15 6-6 6 6 6"/>', chevronRight:'<path d="m9 6 6 6-6 6"/>',
+    sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1 1M18 18l1 1M5 19l1-1M18 6l1-1"/>',
+    moon:'<path d="M21 13a9 9 0 1 1-10-10 7 7 0 0 0 10 10z"/>',
+    search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
+    pin:'<path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0z"/><circle cx="12" cy="10" r="2"/>',
+    user:'<circle cx="12" cy="7" r="3"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/>',
+    download:'<path d="M12 3v12m-5-5 5 5 5-5M4 16v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/>',
+    shield:'<path d="m12 3 8 3v5c0 5-8 10-8 10S4 16 4 11V6zM9 12l2 2 4-4"/>',
+    chart:'<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>',
+    close:'<path d="m6 6 12 12M6 18 18 6"/>', check:'<path d="m5 12 4 4L19 6"/>',
+    book:'<path d="M4 4h6l2 2 2-2h6v15h-6l-2 2-2-2H4zM12 6v15"/>',
+    spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/>'
   };
-
-  var I = {
-    user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
-    pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',
-    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
-    cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>',
-    book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7"/></svg>',
-    link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>',
-    sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
-    moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
-    chev: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>',
+  const icon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.book}</svg>`;
+  const fillIcons = root => root.querySelectorAll('[data-icon]').forEach(el => { el.innerHTML = icon(el.dataset.icon); });
+  fillIcons(document);
+  let favorites;
+  try { const parsed = JSON.parse(read('sched.favorites', '[]')); favorites = Array.isArray(parsed) ? parsed.filter(f => f && typeof f.key === 'string' && typeof f.group === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(f.date)) : []; } catch (_) { favorites = []; }
+  const storedGroup = read('sched.group', '');
+  const query = new URLSearchParams(location.search);
+  const requestedDate = query.get('date');
+  const validDate = /^\d{4}-\d{2}-\d{2}$/.test(requestedDate || '') && C.iso(C.parse(requestedDate)) === requestedDate;
+  const state = {
+    group: data.groups[query.get('group')] ? query.get('group') : data.groups[storedGroup] ? storedGroup : 'ИБО-24',
+    date: validDate ? requestedDate : C.moscowNow().key,
+    filter: ['all','main','cbi'].includes(read('sched.filter','all')) ? read('sched.filter','all') : 'all',
+    view:'schedule', query:'', theme:read('sched.theme', 'dark') === 'light' ? 'light' : 'dark',
+    favorites, rendered:[], dialogKind:null, calendarMonth:null, dialogLesson:null
   };
-
-  var $ = function (id) { return document.getElementById(id); };
-  var el = {};
-  ["picker", "schedule", "groupList", "ver", "chipName", "chipDot", "groupChip", "themeBtn", "monthLabel", "weekLabel",
-    "todayBtn", "prevWeek", "nextWeek", "weekStrip", "indicator", "viewport", "overlay", "sheet"].forEach(function (id) { el[id] = $(id); });
-  var isHidden = function (node) { return node.classList.contains("hidden"); };
-
-  /* ── Тема ── */
+  if (state.group === 'МК1') state.filter = 'all';
+  let lastFocus = null, toastTimer;
+  const lessonKey = (date, lesson) => `${state.group}|${date}|${lesson.time}|${lesson.subject}`;
+  const saved = (date, lesson) => state.favorites.some(f => f.key === lessonKey(date, lesson));
+  const pulse = () => { if (TG.available() && TG.atLeast('6.1')) TG.post('web_app_trigger_haptic_feedback', { type:'selection_change' }); };
+  function toast(message) { $('toast').textContent = message; $('toast').classList.add('visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('visible'), 3500); }
   function applyTheme() {
-    document.documentElement.setAttribute("data-theme", state.theme);
-    el.themeBtn.innerHTML = state.theme === "dark" ? I.sun : I.moon;
-    var bg = state.theme === "dark" ? "#07090f" : "#eef1fb";
-    document.querySelector('meta[name="theme-color"]').setAttribute("content", bg);
-    if (!TG.available()) return;
-    if (TG.atLeast("6.9")) TG.post("web_app_set_header_color", { color: bg });
-    if (TG.atLeast("6.1")) TG.post("web_app_set_background_color", { color: bg });
-    if (TG.atLeast("7.10")) TG.post("web_app_set_bottom_bar_color", { color: bg });
-  }
-  el.themeBtn.addEventListener("click", function () {
-    state.theme = state.theme === "dark" ? "light" : "dark";
-    store.set("sched.theme", state.theme);
-    applyTheme();
-    haptic.tap();
-  });
-
-  /* ── Выбор группы ── */
-  function renderPicker() {
-    if (!Object.keys(GROUPS).length) {
-      el.groupList.innerHTML = '<div class="empty glass"><div class="ico">⚠️</div><b>Нет данных расписания</b><p>' +
-        (dataError ? "В JSON с расписанием ошибка: " + esc(dataError) : "В JSON с расписанием нет ни одной группы.") + "</p></div>";
-      return;
+    document.documentElement.dataset.theme = state.theme;
+    $('theme').innerHTML = icon(state.theme === 'dark' ? 'sun' : 'moon');
+    $('theme').setAttribute('aria-label', state.theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему');
+    const bg = state.theme === 'dark' ? '#0a1019' : '#eef3f8';
+    document.querySelector('meta[name="theme-color"]').content = bg;
+    if (TG.available()) {
+      if (TG.atLeast('6.9')) TG.post('web_app_set_header_color', { color:bg });
+      if (TG.atLeast('6.1')) TG.post('web_app_set_background_color', { color:bg });
+      if (TG.atLeast('7.10')) TG.post('web_app_set_bottom_bar_color', { color:bg });
     }
-    el.groupList.innerHTML = Object.keys(GROUPS).map(function (name, i) {
-      return '<button class="group-card glass' + (name === state.group ? " current" : "") + '" data-group="' + esc(name) +
-        '" style="animation-delay:' + i * 60 + 'ms"><span class="badge">' + esc(name) + '</span><span class="meta"><b>' + esc(name) +
-        "</b><span>" + esc(GROUPS[name].subtitle || "") + "</span><em>" + esc(groupStats(name)) + '</em></span><span class="chev">' + I.chev + "</span></button>";
-    }).join("");
   }
-  el.groupList.addEventListener("click", function (e) {
-    var card = e.target.closest("[data-group]");
-    if (!card) return;
-    haptic.tap();
-    state.group = card.getAttribute("data-group");
-    store.set("sched.group", state.group);
-    showSchedule();
-  });
-  function showPicker() {
-    renderPicker();
-    el.picker.classList.remove("hidden");
-    el.schedule.classList.add("hidden");
-    updateBackButton();
-  }
-  function showSchedule() {
-    el.chipName.textContent = state.group;
-    el.chipDot.textContent = state.group.replace(/[^A-Za-zА-Яа-яЁё]/g, "").slice(0, 2).toUpperCase();
-    el.picker.classList.add("hidden");
-    el.schedule.classList.remove("hidden");
-    renderWeek();
-    renderDay(0);
-    updateBackButton();
-  }
-  el.groupChip.addEventListener("click", function () { haptic.tap(); showPicker(); });
-
-  /* ── Неделя ── */
+  function get(key, filter = state.filter) { return C.getDay(data, state.group, key, filter); }
+  function weekDays() { const mon = C.monday(C.parse(state.date)); return Array.from({ length:7 }, (_,i) => C.iso(C.addDays(mon,i))); }
   function renderWeek() {
-    var mon = mondayOf(state.date), sun = addDays(mon, 6), t = today();
-    el.monthLabel.textContent = mon.getMonth() === sun.getMonth()
-      ? MONTHS[sun.getMonth()] + " " + sun.getFullYear()
-      : MONTHS[mon.getMonth()].slice(0, 3) + " – " + MONTHS[sun.getMonth()].slice(0, 3).toLowerCase() + " " + sun.getFullYear();
-    var diff = Math.round((mon - mondayOf(t)) / 6048e5);
-    var rel = diff === 0 ? "текущая" : diff === 1 ? "следующая" : diff === -1 ? "прошлая" : (diff > 0 ? "+" : "") + diff + " нед.";
-    el.weekLabel.textContent = (mon.getMonth() === sun.getMonth()
-      ? mon.getDate() + "–" + sun.getDate() + " " + short3(sun.getMonth())
-      : mon.getDate() + " " + short3(mon.getMonth()) + " – " + sun.getDate() + " " + short3(sun.getMonth())) + " · " + rel;
-    el.todayBtn.hidden = sameDay(state.date, t);
-
-    var html = "";
-    for (var i = 0; i < 7; i++) {
-      var d = addDays(mon, i), day = getDay(state.group, d);
-      var pips = day.status === "ok" ? day.lessons.slice(0, 6).map(function (l) { return '<i class="' + typeClass(l.type) + '"></i>'; }).join("") : "";
-      html += '<button class="day-btn' + (sameDay(d, t) ? " is-today" : "") + (sameDay(d, state.date) ? " active" : "") +
-        '" data-date="' + iso(d) + '" aria-label="' + DW_FULL[i] + ", " + d.getDate() + " " + MONTHS_GEN[d.getMonth()] + '"><span class="dw">' +
-        DW_SHORT[i] + '</span><span class="dn">' + d.getDate() + '</span><span class="pips">' + pips + "</span></button>";
-    }
-    var old = el.weekStrip.querySelectorAll(".day-btn");
-    for (var j = 0; j < old.length; j++) old[j].parentNode.removeChild(old[j]);
-    el.weekStrip.insertAdjacentHTML("beforeend", html);
-    moveIndicator();
+    const days = weekDays(), today = C.moscowNow().key;
+    $('month-label').textContent = capital(format(state.date, { month:'long',year:'numeric' }).replace(' г.',''));
+    $('week-strip').innerHTML = days.map((key,i) => {
+      const day = get(key);
+      return `<button class="day-button${key === state.date ? ' selected' : ''}${key === today ? ' is-today' : ''}" data-date="${key}" aria-label="${esc(fullDate(key))}" aria-pressed="${key === state.date}"${key === today ? ' aria-current="date"' : ''}><span class="day-name">${dayNames[i]}</span><span class="day-number">${C.parse(key).getDate()}</span><span class="day-pips">${day.lessons.slice(0,5).map(l => `<i class="${l.kind}"></i>`).join('')}</span></button>`;
+    }).join('');
+    const counts = days.map(key => get(key).lessons.length), total = counts.reduce((a,b) => a+b,0), max = Math.max(1,...counts);
+    $('week-range').textContent = `${shortDate(days[0])} — ${shortDate(days[6])}`;
+    $('week-total').textContent = total;
+    $('week-chart').innerHTML = days.map((key,i) => `<button class="chart-column${key === state.date ? ' selected' : ''}" data-date="${key}" aria-label="${esc(fullDate(key))}, ${counts[i]} ${C.plural(counts[i])}"><i class="chart-bar" style="height:${Math.max(3,counts[i]/max*70)}px"></i><span>${dayNames[i]}</span></button>`).join('');
+    $('week-duration').textContent = `${duration(days.reduce((n,key) => n + C.duration(get(key).lessons),0))} занятий за неделю`;
   }
-  function moveIndicator() {
-    var active = el.weekStrip.querySelector(".day-btn.active");
-    if (!active) return;
-    el.indicator.style.width = active.offsetWidth + "px";
-    el.indicator.style.transform = "translateX(" + active.offsetLeft + "px)";
-  }
-  window.addEventListener("resize", moveIndicator);
-
-  el.weekStrip.addEventListener("click", function (e) {
-    var b = e.target.closest(".day-btn");
-    if (!b) return;
-    var p = b.getAttribute("data-date").split("-");
-    goTo(new Date(+p[0], +p[1] - 1, +p[2]));
-  });
-  el.prevWeek.addEventListener("click", function () { goTo(addDays(state.date, -7)); });
-  el.nextWeek.addEventListener("click", function () { goTo(addDays(state.date, 7)); });
-  el.todayBtn.addEventListener("click", function () { goTo(today()); });
-
-  function goTo(date) {
-    date = startOfDay(date);
-    if (sameDay(date, state.date)) return;
-    var dir = date > state.date ? 1 : -1;
-    var weekChanged = !sameDay(mondayOf(date), mondayOf(state.date));
-    state.date = date;
-    haptic.select();
-    if (weekChanged) renderWeek();
-    else {
-      var btns = el.weekStrip.querySelectorAll(".day-btn");
-      for (var i = 0; i < btns.length; i++) btns[i].classList.toggle("active", btns[i].getAttribute("data-date") === iso(date));
-      el.todayBtn.hidden = sameDay(date, today());
-      moveIndicator();
+  function renderHero() {
+    const now = C.moscowNow(), day = get(state.date), isToday = state.date === now.key;
+    let lesson = day.lessons.find(l => isToday && C.minutes(C.times(l)[0]) <= now.minute && C.minutes(C.times(l)[1]) > now.minute);
+    const running = Boolean(lesson);
+    if (!lesson) lesson = day.lessons.find(l => !isToday || C.minutes(C.times(l)[0]) > now.minute);
+    let heading, status, meta = '', bottom = '';
+    if (lesson) {
+      status = running ? 'СЕЙЧАС НА ПАРЕ' : isToday ? 'СЛЕДУЮЩАЯ ПАРА' : state.date < now.key ? 'ИЗ АРХИВА · ' + shortDate(state.date).toUpperCase() : 'ПЛАН НА ' + shortDate(state.date).toUpperCase();
+      heading = lesson.subject;
+      meta = `<span>${icon('clock')}${esc(lesson.time.replace('-', ' — '))}</span><span>${icon('pin')}${esc(lesson.room || 'Аудитория не указана')}</span>`;
+      bottom = running ? `До конца <b>${C.minutes(C.times(lesson)[1]) - now.minute} мин</b>` : isToday ? `До начала <b>${duration(C.minutes(C.times(lesson)[0]) - now.minute)}</b>` : `${esc(lesson.type)} · ${lesson.kind === 'cbi' ? 'ЦБИ' : esc(state.group)}`;
+      $('hero').onclick = () => showLesson(state.date, lesson);
+    } else {
+      const done = isToday && day.lessons.length;
+      status = done ? 'НА СЕГОДНЯ ВСЁ' : day.status === 'free' ? 'МОЖНО ВЫДОХНУТЬ' : 'ТВОЙ УЧЕБНЫЙ РИТМ';
+      heading = done ? 'День завершён. Ты молодец.' : day.status === 'free' ? 'Время для своих планов.' : 'Новый день — новые планы.';
+      meta = `<span>${icon('calendar')}${shortDate(state.date)}</span><span>${esc(state.group)}</span>`;
+      bottom = done ? 'Все занятия на выбранный день закончились.' : day.status === 'free' ? 'В расписании на этот день пар нет.' : 'На выбранную дату пока нет занятий в этом разделе.';
+      $('hero').onclick = null;
     }
-    renderDay(dir);
+    $('hero').innerHTML = `<div class="hero-content"><div class="hero-status">${running ? '<i class="live-dot"></i>' : icon('spark')}${status}</div><h2>${esc(heading)}</h2><div class="hero-meta">${meta}</div><div class="hero-bottom">${bottom}</div></div><div class="hero-orbit" aria-hidden="true"><div class="orbit-ring"></div><div class="orbit-ring"></div><div class="orbit-ring"></div><div class="orbit-core"></div><div class="orbit-satellite"></div></div>${lesson ? '<button class="hero-open" aria-label="Открыть ближайшее занятие"></button>' : ''}`;
   }
-
-  /* ── День ── */
-  function lessonHTML(l, i, isToday, now) {
-    var t = splitTime(l.time), s = t[0], e = t[1] || "";
-    var sMin = toMin(s), eMin = e ? toMin(e) : sMin;
-    var mode = "", extra = "";
-    if (isToday && now >= eMin) mode = "past";
-    if (isToday && now >= sMin && now < eMin) {
-      mode = "now";
-      extra = '<div class="progress"><i style="width:' + Math.round((now - sMin) / (eMin - sMin) * 100) + '%"></i></div>' +
-        '<div class="progress-label"><span>идёт ' + fmtDur(now - sMin) + "</span><span>до конца " + fmtDur(eMin - now) + "</span></div>";
-    }
-    var info = (l.room ? "<span>" + I.pin + esc(l.room) + "</span>" : "") + (l.teacher ? "<span>" + I.user + esc(l.teacher) + "</span>" : "");
-    return '<button class="lesson glass ' + typeClass(l.type) + " " + mode + '" data-i="' + i + '"><span class="time"><span class="n">' +
-      (l.num ? esc(l.num) + " пара" : "") + '</span><span class="s">' + esc(s) + '</span><span class="e">' + esc(e) + '</span></span><span class="body"><span class="tag">' +
-      esc(l.type || "занятие") + "</span>" + (mode === "now" ? '<span class="live">сейчас</span>' : "") + "<h3>" + esc(l.subject) +
-      '</h3><span class="info">' + info + "</span></span>" + extra + "</button>";
+  function lessonHTML(date, lesson) {
+    const index = state.rendered.push({ date, lesson }) - 1;
+    const [start,end] = C.times(lesson), now = C.moscowNow();
+    const live = date === now.key && now.minute >= C.minutes(start) && now.minute < C.minutes(end);
+    const color = lesson.type === 'лекция' ? 'var(--mint)' : lesson.type === 'лабораторная' ? 'var(--violet)' : '#e4bd83';
+    const isSaved = saved(date, lesson);
+    return `<div class="lesson-layout"><div class="lesson-time"><strong>${start}</strong><span>${end}</span></div><article class="lesson-card${live ? ' live' : ''}" style="--lesson-color:${color}"><button class="lesson-main" data-lesson="${index}" aria-label="${esc(lesson.subject)}, ${esc(lesson.time)}, подробнее"><div class="lesson-top"><span class="type-tag">${esc(lesson.type || 'занятие')}</span><span>${esc(lesson.num)} пара</span>${lesson.kind === 'cbi' ? '<span class="source-tag">ЦБИ</span>' : ''}${live ? '<span class="live-label"><i class="live-dot"></i>Сейчас</span>' : ''}</div><h3>${esc(lesson.subject)}</h3><div class="lesson-meta">${lesson.room ? `<span>${icon('pin')}${esc(lesson.room)}</span>` : ''}${lesson.teacher ? `<span>${icon('user')}${esc(lesson.teacher)}</span>` : ''}</div>${live ? `<div class="progress-track"><i style="width:${Math.max(0,Math.min(100,(now.minute-C.minutes(start))/(C.minutes(end)-C.minutes(start))*100))}%"></i></div>` : ''}</button><button class="lesson-save${isSaved ? ' saved' : ''}" data-save="${index}" aria-pressed="${isSaved}" aria-label="${isSaved ? 'Убрать из избранного' : 'Добавить в избранное'}">${icon('bookmark')}</button></article></div>`;
   }
-
-  function dayHTML() {
-    var d = state.date, isToday = sameDay(d, today()), now = nowMin();
-    var day = getDay(state.group, d), lessons = day.lessons;
-    state.lessons = lessons;
-    var head = DW_FULL[dayIdx(d)] + ", " + d.getDate() + " " + MONTHS_GEN[d.getMonth()];
-    if (day.status !== "ok") {
-      var sunday = dayIdx(d) === 6, c;
-      if (day.status === "free") c = sunday ? ["🌙", "Выходной", "Воскресенье, пар нет."] : ["☕", "Пар нет", "В этот день занятий не стоит."];
-      else c = sunday ? ["🌙", "Выходной", "На воскресенье расписания нет."] : ["🛰️", "Нет данных", "Расписание на эту дату ещё не добавлено."];
-      return '<div class="day-summary"><b>' + head + '</b></div><div class="empty glass"><div class="ico">' + c[0] + "</div><b>" + c[1] + "</b><p>" + c[2] + "</p></div>";
-    }
-    var first = splitTime(lessons[0].time)[0], last = splitTime(lessons[lessons.length - 1].time)[1] || "";
-    var html = '<div class="day-summary"><b>' + head + '</b><span class="mono">' + lessons.length + " " + plural(lessons.length, "пара", "пары", "пар") +
-      " · " + esc(first) + "–" + esc(last) + '</span></div><div class="lessons">';
-    lessons.forEach(function (l, i) {
-      if (i > 0) {
-        var prevEnd = splitTime(lessons[i - 1].time)[1];
-        var gap = prevEnd ? toMin(splitTime(l.time)[0]) - toMin(prevEnd) : 0;
-        if (gap >= 40) html += '<div class="gap">окно ' + fmtDur(gap) + "</div>";
+  function empty(title, message, action = '') { return `<div class="empty-state">${icon('calendar')}<h3>${title}</h3><p>${message}</p>${action}</div>`; }
+  function matches(lesson) { return [lesson.subject,lesson.room,lesson.teacher,lesson.topic].join(' ').toLocaleLowerCase('ru').includes(state.query.trim().toLocaleLowerCase('ru')); }
+  function renderLessons() {
+    state.rendered = [];
+    const day = get(state.date);
+    $('day-title').textContent = state.view === 'saved' ? 'Сохранённые занятия' : capital(fullDate(state.date));
+    let notices = '';
+    if (state.view === 'saved') {
+      const entries = [];
+      state.favorites.filter(f => f.group === state.group).sort((a,b) => a.date.localeCompare(b.date)).forEach(f => {
+        const lesson = C.getDay(data, f.group, f.date).lessons.find(l => lessonKey(f.date,l) === f.key);
+        if (lesson && (state.filter === 'all' || lesson.kind === state.filter) && matches(lesson)) entries.push({date:f.date,lesson});
+      });
+      $('day-count').textContent = `${entries.length} ${C.plural(entries.length)}`;
+      let previous = '';
+      $('lessons').innerHTML = entries.map(({date,lesson}) => { const header = previous !== date ? `<div class="saved-date">${capital(fullDate(date))}</div>` : ''; previous = date; return header + lessonHTML(date,lesson); }).join('') || empty('Важное — всегда под рукой', state.query ? 'По этому запросу сохранённых занятий нет.' : 'Нажми на закладку у пары, чтобы сохранить её здесь.');
+    } else {
+      $('day-count').textContent = `${day.lessons.length} ${C.plural(day.lessons.length)}`;
+      if (day.origin === 'cycle' && state.filter !== 'cbi') notices += '<div class="notice">Основа — <b>двухнедельный цикл</b> из предыдущего расписания. Изменения на эту дату не присланы.</div>';
+      if (C.conflicts(day.lessons).length) notices += '<div class="notice conflict">Есть пересечение по времени. Открой детали и сверь основные пары с занятиями ЦБИ.</div>';
+      const visible = day.lessons.filter(matches);
+      if (!visible.length) {
+        const known = Object.keys(data.groups[state.group].dates || {}).sort().reverse()[0];
+        const title = state.query ? 'Ничего не нашлось' : day.status === 'free' ? 'Сегодня без пар' : day.status === 'filtered' ? 'В этом разделе пар нет' : 'Расписание ещё не добавлено';
+        const message = state.query ? 'Попробуй другое название, преподавателя или номер аудитории.' : day.status === 'free' ? 'На выбранную дату в расписании нет занятий.' : state.filter === 'cbi' ? 'Занятия ЦБИ добавлены только на даты из исходной таблицы. Это не означает отмену.' : 'У нас пока нет подтверждённых данных на эту дату.';
+        const emptyAction = !state.query && state.filter === 'cbi' ? '<button class="secondary-button" data-action="next-cbi">Ближайшее занятие ЦБИ</button>' : !state.query && day.status === 'nodata' && known ? `<button class="secondary-button" data-date="${known}">Последняя добавленная дата</button>` : '';
+        $('lessons').innerHTML = empty(title,message,emptyAction);
+      } else {
+        let lastEnd = null;
+        $('lessons').innerHTML = visible.map(lesson => {
+          const [start,end] = C.times(lesson), gap = lastEnd === null ? 0 : C.minutes(start) - lastEnd;
+          lastEnd = Math.max(lastEnd || 0,C.minutes(end));
+          return `${gap >= 40 && !state.query ? `<div class="gap-label">Окно · ${duration(gap)}</div>` : ''}${lessonHTML(state.date,lesson)}`;
+        }).join('');
       }
-      html += lessonHTML(l, i, isToday, now);
-    });
-    html += "</div>";
-    if (isToday) {
-      var running = lessons.some(function (l) { var t = splitTime(l.time); return now >= toMin(t[0]) && t[1] && now < toMin(t[1]); });
-      var next = lessons.filter(function (l) { return toMin(splitTime(l.time)[0]) > now; })[0];
-      if (last && now >= toMin(last)) html += '<div class="next-hint">На сегодня всё 🎉</div>';
-      else if (next && !running) html += '<div class="next-hint">Следующая пара через <b>' + fmtDur(toMin(splitTime(next.time)[0]) - now) + "</b></div>";
     }
-    return html;
+    $('notice').innerHTML = notices;
   }
-
-  function renderDay(dir) {
-    var old = el.viewport.querySelector(".day-pane:not(.leaving)");
-    var pane = document.createElement("div");
-    pane.className = "day-pane";
-    pane.innerHTML = dayHTML();
-    if (!dir) pane.classList.add("stagger");
-    var reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-    if (old && dir && !reduce) {
-      old.classList.add("leaving", dir > 0 ? "out-l" : "out-r");
-      old.style.transition = "none"; // уходит с того места, где его отпустил палец
-      setTimeout(function () { if (old.parentNode) old.parentNode.removeChild(old); }, 230);
-      pane.classList.add(dir > 0 ? "in-r" : "in-l");
-    } else if (old) {
-      old.parentNode.removeChild(old);
-    }
-    el.viewport.appendChild(pane);
+  function render() {
+    $('group-name').textContent = state.group;
+    $('group-avatar').textContent = state.group === 'МК1' ? 'МК' : 'ИБ';
+    $('breadcrumb').textContent = state.view === 'saved' ? 'Избранное' : 'Расписание';
+    $('page-title').innerHTML = state.view === 'saved' ? 'Важное — рядом<span>.</span>' : 'Всё по расписанию<span>.</span>';
+    $('page-subtitle').textContent = state.view === 'saved' ? `Сохранённые занятия группы ${state.group}.` : 'Выбирай день. Остальное уже здесь.';
+    $('current-date').textContent = shortDate(C.moscowNow().key);
+    $('hero').hidden = state.view === 'saved';
+    $('cbi-card').hidden = state.group !== 'ИБО-24';
+    document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === state.view));
+    document.querySelectorAll('[data-filter]').forEach(b => { b.classList.toggle('active', b.dataset.filter === state.filter); b.setAttribute('aria-pressed', b.dataset.filter === state.filter); b.hidden = state.group === 'МК1' && b.dataset.filter === 'cbi'; });
+    $('week-strip').hidden = state.view === 'saved';
+    document.querySelector('.week-heading').hidden = state.view === 'saved';
+    $('search').placeholder = state.view === 'saved' ? 'Найти в избранном' : 'Найти предмет или аудиторию';
+    renderWeek(); renderHero(); renderLessons();
   }
-
-  // смена дня (приложение могло быть открыто через полночь)
-  var lastDay = iso(today());
-  function checkDay() {
-    var t = today();
-    if (iso(t) === lastDay) return false;
-    var moved = iso(state.date) === lastDay;
-    if (moved) state.date = t;
-    lastDay = iso(t);
-    if (isHidden(el.schedule)) return true;
-    renderWeek();
-    var pane = el.viewport.querySelector(".day-pane:not(.leaving)");
-    if (moved || !pane) renderDay(0);
-    else { var top = pane.scrollTop; pane.classList.remove("stagger"); pane.innerHTML = dayHTML(); pane.scrollTop = top; }
-    return true;
+  function goTo(key) { state.date = key; state.view = 'schedule'; state.query = ''; $('search').value = ''; pulse(); render(); }
+  function toggleSave(date,lesson) {
+    const key = lessonKey(date,lesson), existed = saved(date,lesson);
+    state.favorites = existed ? state.favorites.filter(f => f.key !== key) : [...state.favorites,{ key,date,group:state.group }];
+    write('sched.favorites',JSON.stringify(state.favorites));
+    pulse(); renderLessons(); toast(existed ? 'Убрано из избранного' : 'Добавлено в избранное');
+    if (state.dialogKind === 'lesson') showLesson(date,lesson);
   }
-  // раз в 30 секунд обновляем «идёт сейчас», если открыт сегодняшний день
-  setInterval(function () {
-    if (document.hidden || checkDay()) return;
-    if (isHidden(el.schedule) || state.sheetOpen || !sameDay(state.date, today())) return;
-    var pane = el.viewport.querySelector(".day-pane:not(.leaving)");
-    if (!pane) return;
-    var top = pane.scrollTop;
-    pane.classList.remove("stagger");
-    pane.innerHTML = dayHTML();
-    pane.scrollTop = top;
-  }, 30000);
-  // свёрнутое приложение не анимирует фон; при возврате проверяем дату
-  function setVisible(visible) {
-    document.documentElement.classList.toggle("paused", !visible);
-    if (visible) checkDay();
+  const dialog = $('dialog');
+  function openDialog(kind,html) {
+    state.dialogKind = kind;
+    $('dialog-content').innerHTML = html;
+    if (!dialog.open) { lastFocus = document.activeElement; dialog.showModal(); document.body.classList.add('modal-open'); }
+    if (TG.available() && TG.atLeast('6.1')) TG.post('web_app_setup_back_button', { is_visible:true });
   }
-  document.addEventListener("visibilitychange", function () { setVisible(!document.hidden); });
-  TG.on("visibility_changed", function (d) { if (d) setVisible(!!d.is_visible); });
-
-  /* ── Свайпы по дням ── */
-  (function () {
-    var x0 = 0, y0 = 0, dx = 0, tracking = false, horiz = null, pane = null;
-    el.viewport.addEventListener("touchstart", function (e) {
-      if (e.touches.length !== 1) return;
-      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0; tracking = true; horiz = null;
-      pane = el.viewport.querySelector(".day-pane:not(.leaving)");
-    }, { passive: true });
-    el.viewport.addEventListener("touchmove", function (e) {
-      if (!tracking || !pane) return;
-      var mx = e.touches[0].clientX - x0, my = e.touches[0].clientY - y0;
-      if (horiz === null && (Math.abs(mx) > 8 || Math.abs(my) > 8)) horiz = Math.abs(mx) > Math.abs(my) * 1.2;
-      if (!horiz) return;
-      dx = mx;
-      pane.style.transition = "none";
-      pane.style.transform = "translateX(" + dx * 0.6 + "px)";
-    }, { passive: true });
-    function end() {
-      if (!tracking) return;
-      tracking = false;
-      if (!pane) return;
-      pane.style.transition = "transform .25s ease-out";
-      if (horiz && Math.abs(dx) > 60) goTo(addDays(state.date, dx < 0 ? 1 : -1));
-      else pane.style.transform = "";
-    }
-    el.viewport.addEventListener("touchend", end);
-    el.viewport.addEventListener("touchcancel", end);
-    document.addEventListener("keydown", function (e) {
-      if (state.sheetOpen) { if (e.key === "Escape") closeSheet(); return; }
-      if (isHidden(el.schedule)) return;
-      if (e.key === "ArrowRight") goTo(addDays(state.date, 1));
-      if (e.key === "ArrowLeft") goTo(addDays(state.date, -1));
-    });
-  })();
-
-  /* ── Нижняя панель ── */
-  el.viewport.addEventListener("click", function (e) {
-    var card = e.target.closest(".lesson");
-    if (card && state.lessons[+card.getAttribute("data-i")]) openSheet(state.lessons[+card.getAttribute("data-i")]);
+  function closeDialog() {
+    dialog.close(); state.dialogKind = null; document.body.classList.remove('modal-open');
+    if (TG.available() && TG.atLeast('6.1')) TG.post('web_app_setup_back_button', { is_visible:false });
+    if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+  }
+  function showGroups() {
+    openDialog('groups',`<h2 id="dialog-title">Твоя группа. Твой ритм.</h2><p class="dialog-description">Выбери группу, и расписание будет под рукой.</p>${['ИБО-24','МК1'].map(name => `<button class="group-option${state.group === name ? ' current' : ''}" data-group="${name}"><span class="group-avatar">${name === 'МК1' ? 'МК' : 'ИБ'}</span><span><b>${name}</b><span>${esc(data.groups[name].subtitle)}</span></span>${state.group === name ? icon('check') : ''}</button>`).join('')}<p class="dialog-footnote">Выбор сохранится на этом устройстве. Группу можно сменить в любой момент.</p>`);
+  }
+  function showSources() {
+    const keys = state.group === 'МК1' ? ['mk-nov','legacy'] : ['ibo-nov','cbi','legacy'];
+    openDialog('sources',`<h2 id="dialog-title">Откуда расписание</h2><p class="dialog-description">${esc(state.group)} · обновлено 23 ноября 2026</p>${keys.map(key => `<section class="source-item"><h3>${esc(data.sources[key].title)}</h3><p>${esc(data.sources[key].description)}</p></section>`).join('')}<p class="dialog-footnote">Точные даты имеют приоритет над циклом. «Нет данных» и «Пар нет» — разные состояния. Время всех занятий — московское.</p>`);
+  }
+  function showLesson(date,lesson) {
+    state.dialogLesson = {date,lesson};
+    const row = (symbol,label,value) => `<div class="detail-row">${icon(symbol)}<div><small>${label}</small><p>${esc(value)}</p></div></div>`;
+    openDialog('lesson',`<h2 id="dialog-title">${esc(lesson.subject)}</h2><div class="detail-tags"><span>${esc(lesson.type)}</span><span>${lesson.kind === 'cbi' ? 'ЦБИ' : esc(state.group)}</span></div>${row('calendar','Дата',capital(fullDate(date)) + ' ' + C.parse(date).getFullYear())}${row('clock','Время',lesson.time.replace('-',' — ') + ' · МСК')}${row('pin','Аудитория',lesson.room || 'Не указана в источнике')}${row('user','Преподаватель',lesson.teacher || 'Не указан в источнике')}${lesson.topic ? row('book','Тема занятия',lesson.topic) : ''}${row('layers','Источник',data.sources[lesson.source]?.title || 'Предыдущее расписание')}<button class="primary-button" data-action="save-detail">${icon('bookmark')}${saved(date,lesson) ? 'Убрать из избранного' : 'Сохранить занятие'}</button>`);
+  }
+  function showCalendar(month) {
+    state.calendarMonth = month || C.parse(state.date);
+    const first = new Date(state.calendarMonth.getFullYear(),state.calendarMonth.getMonth(),1,12), days = new Date(first.getFullYear(),first.getMonth()+1,0).getDate();
+    openDialog('calendar',`<h2 id="dialog-title">Выбери день</h2><div class="calendar-header"><button class="icon-button" data-action="prev-month" aria-label="Предыдущий месяц">${icon('chevronLeft')}</button><b>${format(C.iso(first),{month:'long',year:'numeric'})}</b><button class="icon-button" data-action="next-month" aria-label="Следующий месяц">${icon('chevronRight')}</button></div><div class="calendar-grid">${dayNames.map(s => `<span class="cal-label">${s}</span>`).join('')}${'<span></span>'.repeat(C.dayIndex(first))}${Array.from({length:days},(_,i) => { const key = C.iso(C.addDays(first,i)), known = get(key).lessons.length; return `<button data-calendar-date="${key}" class="${key === state.date ? 'selected' : ''}${!known ? ' cal-missing' : ''}" aria-label="${esc(fullDate(key))}${known ? ', есть занятия' : ''}">${i+1}<i class="${known ? 'cal-dot' : ''}"></i></button>`; }).join('')}</div><p class="calendar-legend">Точкой отмечены дни с занятиями в выбранном разделе.</p>`);
+  }
+  function nextCbi() {
+    const today = C.moscowNow().key;
+    const key = Object.keys(data.groups['ИБО-24'].extra).sort().find(key => key >= today);
+    if (!key) { toast('Новых дат ЦБИ пока нет в расписании'); return; }
+    state.filter = 'cbi'; write('sched.filter',state.filter); goTo(key);
+  }
+  function exportWeek() {
+    const events = weekDays().flatMap(date => get(date).lessons.map(lesson => ({date,lesson})));
+    if (!events.length) { toast('На этой неделе нет занятий для экспорта'); return; }
+    const url = URL.createObjectURL(new Blob([C.ics(events,state.group)],{type:'text/calendar;charset=utf-8'}));
+    const a = document.createElement('a'); a.href = url; a.download = `${state.group}-${weekDays()[0]}.ics`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url),60000);
+    toast('Файл календаря подготовлен');
+  }
+  const actions = { groups:showGroups, sources:showSources, close:closeDialog, calendar:() => showCalendar(), today:() => goTo(C.moscowNow().key), 'prev-week':() => goTo(C.iso(C.addDays(C.parse(state.date),-7))), 'next-week':() => goTo(C.iso(C.addDays(C.parse(state.date),7))), 'next-cbi':nextCbi, export:exportWeek, 'prev-month':() => showCalendar(new Date(state.calendarMonth.getFullYear(),state.calendarMonth.getMonth()-1,1,12)), 'next-month':() => showCalendar(new Date(state.calendarMonth.getFullYear(),state.calendarMonth.getMonth()+1,1,12)), 'save-detail':() => toggleSave(state.dialogLesson.date,state.dialogLesson.lesson) };
+  document.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.action && actions[b.dataset.action]) { actions[b.dataset.action](); return; }
+    if (b.dataset.group) { state.group=b.dataset.group; state.filter='all'; state.view='schedule'; state.query=''; $('search').value=''; write('sched.group',state.group); write('sched.filter',state.filter); closeDialog(); pulse(); render(); return; }
+    if (b.dataset.calendarDate) { closeDialog(); goTo(b.dataset.calendarDate); return; }
+    if (b.dataset.date) { goTo(b.dataset.date); return; }
+    if (b.dataset.filter) { state.filter=b.dataset.filter; write('sched.filter',state.filter); pulse(); render(); return; }
+    if (b.dataset.view) { state.view=b.dataset.view; state.query=''; $('search').value=''; render(); return; }
+    if (b.dataset.lesson !== undefined) { const item=state.rendered[Number(b.dataset.lesson)]; if(item) showLesson(item.date,item.lesson); return; }
+    if (b.dataset.save !== undefined) { const item=state.rendered[Number(b.dataset.save)]; if(item) toggleSave(item.date,item.lesson); }
   });
-  function row(icon, label, value) {
-    var empty = value == null || String(value).trim() === "";
-    return '<div class="row' + (empty ? " muted" : "") + '"><span class="ri">' + icon + "</span><span><small>" + label + "</small><b>" +
-      (empty ? "не указано" : esc(value)) + "</b></span></div>";
-  }
-  function openLink(url) {
-    if (TG.available() && TG.atLeast("6.1")) TG.post("web_app_open_link", { url: url });
-    else window.open(url, "_blank");
-  }
-  function openSheet(l) {
-    haptic.tap();
-    var t = splitTime(l.time), s = t[0], e = t[1] || "", dur = e ? toMin(e) - toMin(s) : 0, d = state.date;
-    var raw = String(l.link || "").trim();
-    var link = /^https?:\/\//i.test(raw) ? raw : /^[^\s\/:?#.]+(\.[^\s\/:?#.]+)+([\/?#:]|$)/.test(raw) ? "https://" + raw : "";
-    if (link) { // нормализуем как официальный SDK: пробелы и кириллица кодируются
-      var a = document.createElement("a");
-      a.href = link;
-      link = /^https?:$/.test(a.protocol) ? a.href : "";
-    }
-    el.sheet.className = "sheet " + typeClass(l.type);
-    el.sheet.innerHTML = '<div class="grabber"></div><span class="tag">' + esc(l.type || "занятие") + "</span><h2>" + esc(l.subject) + "</h2>" +
-      (l.topic ? '<p class="topic">' + esc(l.topic) + "</p>" : "") + '<div class="rows">' +
-      row(I.clock, "Время", s + (e ? " – " + e : "") + (dur > 0 ? " · " + dur + " мин" : "")) +
-      row(I.cal, "Дата", DW_FULL[dayIdx(d)] + ", " + d.getDate() + " " + MONTHS_GEN[d.getMonth()] + (l.num ? " · " + l.num + " пара" : "")) +
-      row(I.user, "Преподаватель", l.teacher) + row(I.pin, "Аудитория", l.room) +
-      (link ? row(I.link, "Материалы", link.replace(/^https?:\/\//i, "")) : "") +
-      '</div><div class="sheet-actions">' + (link ? '<button class="btn primary" id="openLink">' + I.book + "Материалы</button>" : "") +
-      '<button class="btn ' + (link ? "ghost" : "primary") + '" id="closeSheet">Закрыть</button></div>';
-    el.sheet.scrollTop = 0;
-    el.sheet.style.transform = "";
-    el.sheet.classList.add("open");
-    el.overlay.classList.add("open");
-    state.sheetOpen = true;
-    updateBackButton();
-    $("closeSheet").onclick = closeSheet;
-    if (link) $("openLink").onclick = function () { openLink(link); };
-  }
-  function closeSheet() {
-    el.sheet.classList.remove("open");
-    el.overlay.classList.remove("open");
-    el.sheet.style.transform = "";
-    state.sheetOpen = false;
-    updateBackButton();
-  }
-  el.overlay.addEventListener("click", closeSheet);
-  (function () { // свайп панели вниз закрывает её
-    var y0 = 0, dy = 0, drag = false;
-    el.sheet.addEventListener("touchstart", function (e) {
-      if (el.sheet.scrollTop > 0) return;
-      y0 = e.touches[0].clientY; dy = 0; drag = true;
-    }, { passive: true });
-    el.sheet.addEventListener("touchmove", function (e) {
-      if (!drag) return;
-      dy = Math.max(0, e.touches[0].clientY - y0);
-      if (dy > 0) { el.sheet.classList.add("dragging"); el.sheet.style.transform = "translateY(" + dy + "px)"; }
-    }, { passive: true });
-    el.sheet.addEventListener("touchend", function () {
-      if (!drag) return;
-      drag = false;
-      el.sheet.classList.remove("dragging");
-      if (dy > 110) closeSheet(); else el.sheet.style.transform = "";
-    });
-  })();
-
-  /* ── Кнопка «Назад» Telegram ── */
-  var backVisible = null;
-  function updateBackButton() {
-    if (!TG.available() || !TG.atLeast("6.1")) return;
-    var need = state.sheetOpen || (!isHidden(el.picker) && !!state.group);
-    if (need === backVisible) return;
-    backVisible = need;
-    TG.post("web_app_setup_back_button", { is_visible: need });
-  }
-  TG.on("back_button_pressed", function () {
-    if (state.sheetOpen) closeSheet();
-    else if (state.group) showSchedule();
-  });
-
-  /* ── Безопасные зоны Telegram (вырез, кнопки поверх приложения) ── */
-  function insets(top, bottom) {
-    return function (d) {
-      if (!d) return;
-      var r = document.documentElement.style;
-      if (d.top != null) r.setProperty(top, (+d.top || 0) + "px");
-      if (d.bottom != null) r.setProperty(bottom, (+d.bottom || 0) + "px");
-    };
-  }
-  TG.on("safe_area_changed", insets("--tg-sa-top", "--tg-sa-bottom"));       // вырез и системные панели
-  TG.on("content_safe_area_changed", insets("--tg-top", "--tg-bottom"));     // кнопки Telegram в полноэкранном режиме
-
-  /* ── Старт: сначала рисуем, после первого кадра сообщаем Telegram, что готовы ── */
-  var started = false;
-  function signalReady() {
-    document.documentElement.classList.remove("boot"); // первый кадр уже нарисован, включаем переходы
-    if (started || !TG.available()) return;
-    started = true;
-    if (!window.__tgReadySent) { window.__tgReadySent = true; TG.post("web_app_ready"); }
-    TG.post("web_app_expand");
-    if (TG.atLeast("7.7")) TG.post("web_app_setup_swipe_behavior", { allow_vertical_swipe: false });
-    if (TG.atLeast("8.0")) { TG.post("web_app_request_safe_area"); TG.post("web_app_request_content_safe_area"); }
-  }
-  try {
-    // на слабых устройствах фон не анимируем
-    if ((navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) || (navigator.deviceMemory && navigator.deviceMemory <= 2))
-      document.documentElement.classList.add("lite");
-    el.ver.textContent = "версия " + APP_VERSION;
-    applyTheme();
-    if (state.group) showSchedule(); else showPicker();
-  } finally {
-    if (window.requestAnimationFrame) requestAnimationFrame(function () { setTimeout(signalReady, 0); });
-    setTimeout(signalReady, 300); // на случай, если кадры не рисуются (окно ещё скрыто)
-  }
+  $('theme').addEventListener('click', () => { state.theme=state.theme === 'dark' ? 'light' : 'dark'; write('sched.theme',state.theme); applyTheme(); });
+  $('search').addEventListener('input', e => { state.query=e.target.value; renderLessons(); });
+  document.querySelector('.brand').addEventListener('click', e => { e.preventDefault(); state.view='schedule'; render(); });
+  dialog.addEventListener('cancel', e => { e.preventDefault(); closeDialog(); });
+  dialog.addEventListener('click', e => { if (e.target === dialog) { const r=dialog.getBoundingClientRect(); if (e.clientX<r.left || e.clientX>r.right || e.clientY<r.top || e.clientY>r.bottom) closeDialog(); } });
+  document.addEventListener('keydown', e => { if(e.key==='/' && !dialog.open && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) { e.preventDefault(); $('search').focus(); } });
+  let touchStart = null;
+  $('lessons').addEventListener('touchstart', e => { if(e.touches.length===1) touchStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; },{passive:true});
+  $('lessons').addEventListener('touchend', e => { if(!touchStart || state.view!=='schedule' || dialog.open) return; const dx=e.changedTouches[0].clientX-touchStart.x,dy=e.changedTouches[0].clientY-touchStart.y; touchStart=null; if(Math.abs(dx)>75 && Math.abs(dx)>Math.abs(dy)*1.7) goTo(C.iso(C.addDays(C.parse(state.date),dx<0?1:-1))); },{passive:true});
+  TG.on('back_button_pressed',closeDialog);
+  const insets = { hardware:{},content:{} };
+  function safeArea(kind,d) { if(!d)return; insets[kind]=d; for(const edge of ['top','bottom']) document.documentElement.style.setProperty(`--safe-${edge}`,`${Math.max(0,Number(insets.hardware[edge])||0,Number(insets.content[edge])||0)}px`); }
+  TG.on('content_safe_area_changed',d => safeArea('content',d));
+  TG.on('safe_area_changed',d => safeArea('hardware',d));
+  TG.on('theme_changed', d => { if(!read('sched.theme','') && d?.theme_params?.bg_color) { const hex=d.theme_params.bg_color.replace('#',''); state.theme=parseInt(hex.slice(0,2),16)>150?'light':'dark'; applyTheme(); } });
+  if(TG.available()) { TG.post('web_app_ready'); TG.post('web_app_expand'); if(TG.atLeast('8.0')) { TG.post('web_app_request_safe_area'); TG.post('web_app_request_content_safe_area'); } }
+  applyTheme(); render();
+  if(!storedGroup && !query.get('group')) showGroups();
+  let lastToday = C.moscowNow().key;
+  function tick() { const now=C.moscowNow(); if(now.key!==lastToday){ if(state.date===lastToday) state.date=now.key;lastToday=now.key; if(!dialog.open && !document.hidden) { render(); return; } } if(!dialog.open && !document.hidden) { renderHero(); renderLessons(); $('current-date').textContent=shortDate(now.key); } }
+  setInterval(tick,30000);
+  document.addEventListener('visibilitychange', () => { document.documentElement.classList.toggle('paused',document.hidden); if(!document.hidden) tick(); });
 })();
 </script>
 </body>
