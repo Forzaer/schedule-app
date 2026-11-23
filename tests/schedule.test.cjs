@@ -5,10 +5,22 @@ const vm = require('node:vm');
 const C = require('../src/core.js');
 const data = require('../src/schedule.json');
 test('МК1: вся неделя 23–28 ноября внесена по фотографиям без повторения на будущие недели', () => {
-  assert.deepEqual(['23','24','25','26','27','28'].map(d => C.getDay(data,'МК1',`2026-11-${d}`).lessons.length),[4,3,4,2,3,3]);
-  const wed = C.getDay(data,'МК1','2026-11-25').lessons;
-  assert.equal(wed[0].time,'10:50-12:20');
-  assert.equal(wed[3].room,'СП № 5, 302');
+  const lessons = day => C.getDay(data, 'МК1', `2026-11-${day}`).lessons;
+  assert.deepEqual(['23', '24', '25', '26', '27', '28'].map(day => lessons(day).map(lesson => lesson.num)), [
+    [1, 2, 3, 4], [1, 2, 3], [3, 4, 5], [2, 3], [2, 3, 4, 5], [1, 2, 3]
+  ]);
+  const slots = day => lessons(day).map(({ num, time, subject }) => [num, time, subject]);
+  assert.deepEqual(slots('25'), [
+    [3, '12:30-14:00', 'Физическая культура'],
+    [4, '14:10-15:40', 'Фармакология'],
+    [5, '16:00-17:30', 'Анатомия']
+  ]);
+  assert.deepEqual(slots('27'), [
+    [2, '10:50-12:20', 'ИЯПД'],
+    [3, '12:30-14:00', 'С/у_ТП'],
+    [4, '14:10-15:40', 'С/у_ТП'],
+    [5, '16:00-17:30', 'С/у_ТП']
+  ]);
   assert.equal(C.getDay(data,'МК1','2026-12-05').status,'nodata');
   assert.equal(C.getDay(data,'МК1','2026-10-24').lessons.length,3);
 });
